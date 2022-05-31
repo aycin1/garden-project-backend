@@ -10,7 +10,7 @@ const client = new Client(connection);
 client.connect();
 
 app.use(cookieParser());
-// app.use(cors());
+app.use(cors());
 
 app.get("/plants", handleGetPlants);
 
