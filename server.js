@@ -13,6 +13,11 @@ client.connect();
 app.use(cookieParser());
 app.use(cors());
 app.use(bodyParser.json());
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
 
 app.get("/plants", handleGetPlants);
 app.get("/garden/:id", handleGetGarden);
