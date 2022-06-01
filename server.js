@@ -6,8 +6,7 @@ const { Client } = require("pg");
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-const connection =
-  "postgres://ykwcpoaf:6xDkZhVpuLgvSLqxW-wJSfs_mkVQeyqt@surus.db.elephantsql.com/ykwcpoaf";
+const connection = "postgres://ykwcpoaf:6xDkZhVpuLgvSLqxW-wJSfs_mkVQeyqt@surus.db.elephantsql.com/ykwcpoaf";
 const client = new Client(connection);
 client.connect();
 
@@ -17,6 +16,7 @@ app.use(bodyParser.json());
 
 app.get("/plants", handleGetPlants);
 app.get("/garden/:id", handleGetGarden);
+app.post("/new-plant", handleNewPlant);
 app.put("/update-plant-status", handlePlanted);
 app.delete("/:id/", handleDeletePlants);
 
@@ -27,10 +27,7 @@ async function handlePlanted(req, res) {
   const quantity = req.body.quantity;
   const date = req.body.date;
 
-  client.query(
-    `UPDATE plants_in_garden SET quantity = $1, planted_at = $2 WHERE id = $3`,
-    [quantity, date, plantID]
-  );
+  client.query(`UPDATE plants_in_garden SET quantity = $1, planted_at = $2 WHERE id = $3`, [quantity, date, plantID]);
   res.status(200).json({ response: "Planted!" });
 }
 
@@ -55,7 +52,6 @@ async function handleGetPlants(req, res) {
   }
 
   let [name, plantClassification, sowingSeason, harvestingSeason, timeFromSowToHarvest, spacing] = tempArr;
-
 
   const replacementFields = ["$1", "$2", "$3", "$4", "$5", "$6"];
   const replacementValues = [];
@@ -83,4 +79,23 @@ async function handleDeletePlants(req, res) {
   const query = `DELETE FROM plants_in_garden WHERE id = $1`;
   await client.query(query, [id]);
   res.status(200).json({ response: "Deleted successfully" });
+}
+
+async function handleNewPlant(req, res) {
+  const garden_id = req.body.garden_id;
+  const quantity = req.body.quantity;
+  const plant_info_id = req.body.plant_info_id;
+
+  try {
+    client.query(
+      `INSERT INTO plants_in_garden
+  (plant_info_id, garden_id, quantity)
+  VALUES ($1, $2, $3)`,
+      [plant_info_id, garden_id, quantity]
+    );
+  } catch (e) {
+    return res.status(500).json({ error: e });
+  }
+
+  res.status(200).json("Plant Added!");
 }
