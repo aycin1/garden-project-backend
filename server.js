@@ -27,8 +27,8 @@ app.use(
 app.get("/plants", handleGetPlants);
 app.get("/garden/:id", handleGetGarden);
 app.post("/new-plant", handleNewPlant);
-app.put("/update-plant-status", handlePlanted);
-app.put("/harvest", handleHarvest);
+app.patch("/update-plant-status", handlePlanted);
+app.patch("/harvest", handleHarvest);
 app.put("/garden/:id", handleUpdateGarden);
 app.delete("/:id/", handleDeletePlants);
 
