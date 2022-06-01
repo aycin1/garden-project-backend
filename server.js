@@ -95,7 +95,7 @@ async function handleNewPlant(req, res) {
   const garden_id = req.body.garden_id;
   const plant_info_id = req.body.plant_info_id;
 
-  res.json({ plant_info_id, garden_id });
+  res.json({ plant_info_id: plant_info_id ? plant_info_id : "no id", garden_id });
 
   // try {
   //   client.query(
