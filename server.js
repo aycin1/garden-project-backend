@@ -70,7 +70,7 @@ async function handleGetPlants(req, res) {
 
 async function handleGetGarden(req, res) {
   const id = req.params.id;
-  const query = `SELECT name, planted_at, harvested, estimated_harvest_date, quantity FROM plant_info JOIN plants_in_garden ON plant_info.id = plants_in_garden.plant_info_id JOIN gardens ON plants_in_garden.garden_id = gardens.id WHERE gardens.id = $1`;
+  const query = `SELECT plants_in_garden.id, name, planted_at, harvested, estimated_harvest_date, quantity FROM plant_info JOIN plants_in_garden ON plant_info.id = plants_in_garden.plant_info_id JOIN gardens ON plants_in_garden.garden_id = gardens.id WHERE gardens.id = $1`;
   const garden = (await client.query(query, [id])).rows;
   res.json(garden);
 }
