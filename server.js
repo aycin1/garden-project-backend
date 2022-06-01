@@ -85,16 +85,18 @@ async function handleNewPlant(req, res) {
   const garden_id = req.body.garden_id;
   const plant_info_id = req.body.plant_info_id;
 
-  try {
-    client.query(
-      `INSERT INTO plants_in_garden
-  (plant_info_id, garden_id)
-  VALUES ($1, $2)`,
-      [plant_info_id, garden_id]
-    );
-  } catch (e) {
-    return res.status(500).json({ error: e });
-  }
+  res.json({ plant_info_id, garden_id });
 
-  res.status(200).json("Plant Added!");
+  // try {
+  //   client.query(
+  //     `INSERT INTO plants_in_garden
+  // (plant_info_id, garden_id)
+  // VALUES ($1, $2)`,
+  //     [plant_info_id, garden_id]
+  //   );
+  // } catch (e) {
+  //   return res.status(500).json({ error: e });
+  // }
+
+  // res.status(200).json("Plant Added!");
 }
