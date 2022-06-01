@@ -3,7 +3,7 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const { Client } = require("pg");
 const app = express();
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 
 const connection =
   "postgres://ykwcpoaf:6xDkZhVpuLgvSLqxW-wJSfs_mkVQeyqt@surus.db.elephantsql.com/ykwcpoaf";
