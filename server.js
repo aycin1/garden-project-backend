@@ -28,6 +28,7 @@ app.get("/plants", handleGetPlants);
 app.get("/garden/:id", handleGetGarden);
 app.post("/new-plant", handleNewPlant);
 app.put("/update-plant-status", handlePlanted);
+app.put("/harvest", handleHarvest);
 app.delete("/:id/", handleDeletePlants);
 
 app.listen(PORT, () => console.log("listening on port " + PORT));
@@ -106,4 +107,15 @@ async function handleNewPlant(req, res) {
   }
 
   res.status(200).json("Plant Added!");
+}
+
+async function handleHarvest(req, res) {
+  const plantID = req.body;
+  try {
+    await client.query(`UPDATE plants_in_garden SET harvested = true WHERE id = $1`, [plantID]);
+  } catch (e) {
+    return res.status(500).json({ error: e });
+  }
+
+  res.status(200).json("Harvest registered!");
 }
