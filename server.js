@@ -35,9 +35,7 @@ app.delete("/:id/", handleDeletePlants);
 app.listen(PORT, () => console.log("listening on port " + PORT));
 
 async function handlePlanted(req, res) {
-  const plantID = req.body.plant_id;
-  const quantity = req.body.quantity;
-  const date = req.body.date;
+  const { plantID, quantity, date } = req.body;
 
   client.query(`UPDATE plants_in_garden SET quantity = $1, planted_at = $2 WHERE id = $3`, [quantity, date, plantID]);
   res.status(200).json({ response: "Planted!" });
