@@ -36,6 +36,7 @@ app.get("/plants", handleGetPlants);
 app.get("/garden/:id", handleGetGarden);
 app.post("/new-plant", handleNewPlant);
 app.put("/update-plant-status", handlePlanted);
+app.put("/harvest", handleHarvest);
 app.put("/garden/:id", handleUpdateGarden);
 app.delete("/:id/", handleDeletePlants);
 
@@ -129,6 +130,17 @@ async function handleNewPlant(req, res) {
   res.status(200).json("Plant Added!");
 }
 
+
+async function handleHarvest(req, res) {
+  const plantID = req.body;
+  try {
+    await client.query(`UPDATE plants_in_garden SET harvested = true WHERE id = $1`, [plantID]);
+  } catch (e) {
+    return res.status(500).json({ error: e });
+  }
+
+  res.status(200).json("Harvest registered!");
+
 async function handleUpdateGarden(req, res) {
   const id = req.params.id;
   const { name, location } = req.body;
@@ -141,4 +153,5 @@ async function handleUpdateGarden(req, res) {
     return res.status(500).json({ error: e });
   }
   res.status(200).json("Garden updated!");
+
 }
