@@ -6,20 +6,12 @@ const { Client } = require("pg");
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-const connection =
-  "postgres://ykwcpoaf:6xDkZhVpuLgvSLqxW-wJSfs_mkVQeyqt@surus.db.elephantsql.com/ykwcpoaf";
+const connection = "postgres://ykwcpoaf:6xDkZhVpuLgvSLqxW-wJSfs_mkVQeyqt@surus.db.elephantsql.com/ykwcpoaf";
 const client = new Client(connection);
 client.connect();
 
 const corsSettings = {
-  allowedHeaders: [
-    "Access-Control-Allow-Origin",
-    "Authorization",
-    "Content-Type",
-    "Accept",
-    "Origin",
-    "User-Agent",
-  ],
+  allowedHeaders: ["Access-Control-Allow-Origin", "Authorization", "Content-Type", "Accept", "Origin", "User-Agent"],
   credentials: true,
 };
 
@@ -47,10 +39,7 @@ async function handlePlanted(req, res) {
   const quantity = req.body.quantity;
   const date = req.body.date;
 
-  client.query(
-    `UPDATE plants_in_garden SET quantity = $1, planted_at = $2 WHERE id = $3`,
-    [quantity, date, plantID]
-  );
+  client.query(`UPDATE plants_in_garden SET quantity = $1, planted_at = $2 WHERE id = $3`, [quantity, date, plantID]);
   res.status(200).json({ response: "Planted!" });
 }
 
@@ -70,20 +59,11 @@ async function handleGetPlants(req, res) {
 
   for (let i = 0; i < parameterNames.length; i++) {
     const parameterName = parameterNames[i];
-    const parameterValue = queryObj.has(parameterName)
-      ? queryObj.get(parameterName)
-      : undefined;
+    const parameterValue = queryObj.has(parameterName) ? queryObj.get(parameterName) : undefined;
     tempArr.push(parameterValue);
   }
 
-  let [
-    name,
-    plantClassification,
-    sowingSeason,
-    harvestingSeason,
-    timeFromSowToHarvest,
-    spacing,
-  ] = tempArr;
+  let [name, plantClassification, sowingSeason, harvestingSeason, timeFromSowToHarvest, spacing] = tempArr;
 
   const replacementFields = ["$1", "$2", "$3", "$4", "$5", "$6"];
   const replacementValues = [];
@@ -130,7 +110,6 @@ async function handleNewPlant(req, res) {
   res.status(200).json("Plant Added!");
 }
 
-
 async function handleHarvest(req, res) {
   const plantID = req.body;
   try {
@@ -140,18 +119,15 @@ async function handleHarvest(req, res) {
   }
 
   res.status(200).json("Harvest registered!");
+}
 
 async function handleUpdateGarden(req, res) {
   const id = req.params.id;
   const { name, location } = req.body;
   try {
-    client.query(
-      `UPDATE gardens SET garden_name = $1, location = $2 WHERE id = $3`,
-      [name, location, id]
-    );
+    client.query(`UPDATE gardens SET garden_name = $1, location = $2 WHERE id = $3`, [name, location, id]);
   } catch (e) {
     return res.status(500).json({ error: e });
   }
   res.status(200).json("Garden updated!");
-
 }
