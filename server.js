@@ -17,7 +17,8 @@ app.use(bodyParser.json());
 app.get("/plants", handleGetPlants);
 app.get("/garden/:id", handleGetGarden);
 app.put("/update-plant-status", handlePlanted);
-app.delete("garden/:id/:plantId", handleDeletePlants);
+app.delete("/garden/:id/:plantId", handleDeletePlants);
+
 
 app.listen(PORT, () => console.log("listening on port " + PORT));
 
@@ -63,10 +64,10 @@ async function handleGetGarden(req, res) {
   res.json(garden);
 }
 
-// to fix
 async function handleDeletePlants(req, res) {
-  const { id, plantId } = req.params.id;
+  const id = req.params.id;
+  const plantId = req.params.plantId;
   const query = `DELETE FROM plants_in_garden WHERE garden_id = $1 AND id = $2`;
   await client.query(query, [id, plantId]);
-  return res.json({ response: "Deleted successfully" }, 200);
+  res.status(200).json({ response: "Deleted successfully" });
 }
