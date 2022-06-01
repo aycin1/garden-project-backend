@@ -17,7 +17,7 @@ const corsSettings = {
 
 app.use(cookieParser());
 app.use(cors(corsSettings));
-app.use(bodyParser.json());
+app.use(express.json());
 app.use(
   bodyParser.urlencoded({
     extended: true,
@@ -92,10 +92,9 @@ async function handleDeletePlants(req, res) {
 }
 
 async function handleNewPlant(req, res) {
-  const garden_id = await req.body.gardenID;
-  const plant_info_id = await req.body.plantInfoID;
+  const { plantInfoID, gardenID } = req.body;
 
-  res.json({ plant_info_id, garden_id, body: req.body });
+  res.json({ plantInfoID, gardenID, body: req.body });
 
   // try {
   //   client.query(
