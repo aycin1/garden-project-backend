@@ -94,18 +94,16 @@ async function handleDeletePlants(req, res) {
 async function handleNewPlant(req, res) {
   const { plantInfoID, gardenID } = req.body;
 
-  res.json({ plantInfoID, gardenID, body: req.body });
+  try {
+    client.query(
+      `INSERT INTO plants_in_garden
+  (plant_info_id, garden_id)
+  VALUES ($1, $2)`,
+      [plant_info_id, garden_id]
+    );
+  } catch (e) {
+    return res.status(500).json({ error: e });
+  }
 
-  // try {
-  //   client.query(
-  //     `INSERT INTO plants_in_garden
-  // (plant_info_id, garden_id)
-  // VALUES ($1, $2)`,
-  //     [plant_info_id, garden_id]
-  //   );
-  // } catch (e) {
-  //   return res.status(500).json({ error: e });
-  // }
-
-  // res.status(200).json("Plant Added!");
+  res.status(200).json("Plant Added!");
 }
