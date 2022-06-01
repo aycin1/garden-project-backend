@@ -19,7 +19,6 @@ app.get("/garden/:id", handleGetGarden);
 app.put("/update-plant-status", handlePlanted);
 app.delete("/garden/:id/:plantId", handleDeletePlants);
 
-
 app.listen(PORT, () => console.log("listening on port " + PORT));
 
 async function handlePlanted(req, res) {
@@ -35,13 +34,23 @@ async function handleGetPlants(req, res) {
   const queryParams = req.url.split("?")[1];
   const queryObj = new URLSearchParams(queryParams);
 
-  let name, plantClassification, sowingSeason, harvestingSeason, timeFromSowToHarvest, spacing;
-  if (queryObj.has("name")) name = queryObj.get("name");
-  if (queryObj.has("plantClassification")) plantClassification = queryObj.get("plantClassification");
-  if (queryObj.has("sowingSeason")) sowingSeason = queryObj.get("sowingSeason");
-  if (queryObj.has("harvestingSeason")) harvestingSeason = queryObj.get("harvestingSeason");
-  if (queryObj.has("timeFromSowToHarvest")) timeFromSowToHarvest = queryObj.get("timeFromSowToHarvest");
-  if (queryObj.has("spacing")) spacing = queryObj.get("spacing");
+  let tempArr = [];
+  let parameterNames = [
+    "name",
+    "plantClassification",
+    "sowingSeason",
+    "harvestingSeason",
+    "timeFromSowToHarvest",
+    "spacing",
+  ];
+
+  for (let i = 0; i < parameterNames.length; i++) {
+    const parameterName = parameterNames[i];
+    const parameterValue = queryObj.has(parameterName) ? queryObj.get(parameterName) : undefined;
+    tempArr.push(parameterValue);
+  }
+
+  let [name, plantClassification, sowingSeason, harvestingSeason, timeFromSowToHarvest, spacing] = tempArr;
 
   const replacementFields = ["$1", "$2", "$3", "$4", "$5", "$6"];
   const replacementValues = [];
