@@ -10,8 +10,13 @@ const connection = "postgres://ykwcpoaf:6xDkZhVpuLgvSLqxW-wJSfs_mkVQeyqt@surus.d
 const client = new Client(connection);
 client.connect();
 
+const corsSettings = {
+  allowedHeaders: ["Access-Control-Allow-Origin", "Authorization", "Content-Type", "Accept", "Origin", "User-Agent"],
+  credentials: true,
+};
+
 app.use(cookieParser());
-app.use(cors());
+app.use(cors(corsSettings));
 app.use(bodyParser.json());
 app.use(
   bodyParser.urlencoded({
