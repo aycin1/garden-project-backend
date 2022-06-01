@@ -92,10 +92,10 @@ async function handleDeletePlants(req, res) {
 }
 
 async function handleNewPlant(req, res) {
-  const garden_id = await req.body.garden_id;
-  const plant_info_id = await req.body.plant_info_id;
+  const garden_id = await req.body.gardenID;
+  const plant_info_id = await req.body.plantInfoID;
 
-  res.json({ plant_info_id: plant_info_id ? plant_info_id : "no id", garden_id });
+  res.json({ plant_info_id, garden_id, body: req.body });
 
   // try {
   //   client.query(
