@@ -127,3 +127,5 @@ async function handleUpdateGarden(req, res) {
   }
   res.status(200).json("Garden updated!");
 }
+
+// This comment is to restart the server after a bad request
