@@ -113,7 +113,7 @@ async function handleGetPlants(req, res) {
       const DesiredWeeks = Number(queriedTime);
 
       let instructions = plant.harvest_instructions;
-      if (instructions.includes("weeks")) instructions = instructions.split("weeks")[1];
+      if (instructions.includes("weeks")) instructions = instructions.split("weeks")[0];
       if (instructions.includes("-")) instructions = instructions.split("-")[1];
 
       let maxHarvestWeeks = Number(instructions.replace(/[^0-9]/g, ""));
