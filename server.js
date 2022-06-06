@@ -109,7 +109,7 @@ async function handleGetPlants(req, res) {
   if (classification) {
     if (replacementFields.length < totalPossibleFields) dbQuery += ` AND`;
     else dbQuery += ` WHERE`;
-    dbQuery += ` classification ILIKE ${replacementFields.shift()}`;
+    dbQuery += ` classification ILIKE '%' || ${replacementFields.shift()} || '%'`;
     replacementValues.push(classification);
   }
   if (sowingSeason) {
@@ -135,7 +135,7 @@ async function handleGetPlants(req, res) {
 
       let instructions = plant.harvest_instructions;
       if (instructions.includes("weeks"))
-        instructions = instructions.split("weeks")[1];
+        instructions = instructions.split("weeks")[0];
       if (instructions.includes("-")) instructions = instructions.split("-")[1];
 
       let maxHarvestWeeks = Number(instructions.replace(/[^0-9]/g, ""));
