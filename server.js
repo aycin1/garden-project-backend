@@ -36,6 +36,7 @@ app.get("/plants", handleGetPlants);
 app.get("/plants/:id", handleGetPlantByID);
 app.get("/garden/:id", handleGetGarden);
 app.get("/shopping-list", handleGetShopping);
+app.get("/gardens/:id", handleGetGardensForUser);
 app.post("/new-plant", handleNewPlant);
 app.post("/shopping-list", handleAddShopping);
 app.patch("/update-plant-status", handlePlanted);
@@ -67,6 +68,13 @@ async function handleGetShopping(req, res) {
   const response = (await client.query(`SELECT * FROM shopping_list`)).rows;
 
   res.status(200).json(response);
+}
+
+async function handleGetGardensForUser(req, res) {
+  const id = req.params.id;
+  const query = `SELECT location, garden_name FROM gardens WHERE user_id = $1;`;
+  const gardens = (await client.query(query, [id])).rows;
+  res.json(gardens);
 }
 
 async function handleAddShopping(req, res) {
@@ -109,7 +117,7 @@ async function handleGetPlants(req, res) {
   if (classification) {
     if (replacementFields.length < totalPossibleFields) dbQuery += ` AND`;
     else dbQuery += ` WHERE`;
-    dbQuery += ` classification ILIKE ${replacementFields.shift()}`;
+    dbQuery += ` classification ILIKE '%' || ${replacementFields.shift()} || '%'`;
     replacementValues.push(classification);
   }
   if (sowingSeason) {
@@ -134,13 +142,13 @@ async function handleGetPlants(req, res) {
       const DesiredWeeks = Number(queriedTime);
 
       let instructions = plant.harvest_instructions;
-      if (instructions.includes("weeks"))
-        instructions = instructions.split("weeks")[1];
-      if (instructions.includes("-")) instructions = instructions.split("-")[1];
 
+      if (instructions.includes("weeks")) instructions = instructions.split("weeks")[0];
+      if (instructions.includes("-")) instructions = instructions.split("-")[0];
       let maxHarvestWeeks = Number(instructions.replace(/[^0-9]/g, ""));
-      if (instructions.includes("days")) maxHarvestWeeks /= 7;
-      if (instructions.includes("years")) maxHarvestWeeks *= 52;
+
+      if (plant.harvest_instructions.includes("days")) maxHarvestWeeks /= 7;
+      if (plant.harvest_instructions.includes("years")) maxHarvestWeeks *= 52;
 
       if (!weeksQueriedAsMinimum && maxHarvestWeeks < DesiredWeeks)
         filteredResults.push(plant);
@@ -150,7 +158,8 @@ async function handleGetPlants(req, res) {
   }
 
   if (queryObj.has("spacing")) {
-    results.forEach((plant) => {
+    resultsToFilter = queryObj.has("timeUntilHarvest") ? filteredResults : results; // So that results are nor reintroduced
+    resultsToFilter.forEach(plant => {
       let queriedSpacing = queryObj.get("spacing");
 
       const spacingQueriedAsMinimum = queriedSpacing.includes("g");
@@ -159,15 +168,14 @@ async function handleGetPlants(req, res) {
       const DesiredSpacing = Number(queriedSpacing);
 
       let instructions = plant.space_instructions;
-      if (instructions.includes("-")) instructions = instructions.split("-")[1];
+      if (instructions.includes("-")) instructions = instructions.split("-")[0];
 
       let maxSpacing = instructions.replace(/[^0-9]/g, "");
       if (instructions.includes("Metre")) maxSpacing *= 39;
 
-      if (!spacingQueriedAsMinimum && maxSpacing < DesiredSpacing)
-        filteredResults.push(plant);
-      if (spacingQueriedAsMinimum && maxSpacing > DesiredSpacing)
-        filteredResults.push(plant);
+      if (!spacingQueriedAsMinimum && maxSpacing <= DesiredSpacing) filteredResults.push(plant);
+      if (spacingQueriedAsMinimum && maxSpacing >= DesiredSpacing) filteredResults.push(plant);
+
     });
   }
 
