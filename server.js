@@ -88,7 +88,7 @@ async function handleGetPlants(req, res) {
   if (classification) {
     if (replacementFields.length < totalPossibleFields) dbQuery += ` AND`;
     else dbQuery += ` WHERE`;
-    dbQuery += ` classification ILIKE '%' || ${replacementFields.shift()} || '%`;
+    dbQuery += ` classification ILIKE '%' || ${replacementFields.shift()} || '%'`;
     replacementValues.push(classification);
   }
   if (sowingSeason) {
