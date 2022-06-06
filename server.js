@@ -47,7 +47,7 @@ async function handleGetPlants(req, res) {
   const queryObj = new URLSearchParams(queryParams);
 
   let tempArr = [];
-  let parameterNames = ["name", "classification", "sowingSeason", "timeFromSowToHarvest", "spacing"];
+  let parameterNames = ["name", "classification", "sowingSeason"];
 
   for (let i = 0; i < parameterNames.length; i++) {
     const parameterName = parameterNames[i];
@@ -55,9 +55,9 @@ async function handleGetPlants(req, res) {
     tempArr.push(parameterValue);
   }
 
-  let [name, classification, sowingSeason, timeFromSowToHarvest, spacing] = tempArr;
+  let [name, classification, sowingSeason] = tempArr;
 
-  const replacementFields = ["$1", "$2", "$3", "$4", "$5"];
+  const replacementFields = ["$1", "$2", "$3"];
   const replacementValues = [];
   const totalPossibleFields = replacementFields.length;
 
@@ -81,7 +81,30 @@ async function handleGetPlants(req, res) {
 
   const results = (await client.query(dbQuery, replacementValues)).rows;
 
-  res.json(results);
+  // "timeFromSowToHarvest", "spacing"
+  let filteredResults = [];
+
+  if (queryObj.has("timeUntilHarvest")) {
+    results.forEach((plant, i) => {
+      let instructions = plant.harvest_instructions;
+
+      if (instructions.includes("weeks")) {
+        if (instructions.includes("-")) instructions = instructions.split("-")[1];
+        const maxDesiredWeeks = Number(queryObj.get("timeUntilHarvest"));
+        const maxActualWeeks = Number(instructions.replace(/[^0-9]/g, ""));
+        if (maxActualWeeks < maxDesiredWeeks) filteredResults.push(plant);
+      } else {
+        const overTwoYearsDesired = queryObj.get("timeUntilHarvest") == "24%2B"; // %2B is + in UTF-8
+        if (overTwoYearsDesired ? !instructions.includes("days") : instructions.includes("days")) {
+          filteredResults.push(plant);
+        }
+      }
+    });
+  }
+
+  if (!queryObj.has("timeUntilHarvest") && !queryObj.has("spacing")) filteredResults = results;
+
+  res.json(filteredResults);
 }
 
 async function handleGetGarden(req, res) {
