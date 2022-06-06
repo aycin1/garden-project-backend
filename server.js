@@ -79,6 +79,7 @@ async function handleGetPlants(req, res) {
     replacementValues.push(sowingSeason);
   }
 
+  dbQuery += ` ORDER BY name`;
   const results = (await client.query(dbQuery, replacementValues)).rows;
 
   // "timeFromSowToHarvest", "spacing"
