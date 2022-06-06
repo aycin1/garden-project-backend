@@ -26,7 +26,9 @@ app.use(
 
 app.get("/plants", handleGetPlants);
 app.get("/garden/:id", handleGetGarden);
+app.get("/shopping-list", handleGetShopping);
 app.post("/new-plant", handleNewPlant);
+app.post("/shopping-list", handleAddShopping);
 app.patch("/update-plant-status", handlePlanted);
 app.patch("/harvest", handleHarvest);
 app.put("/garden/:id", handleUpdateGarden);
@@ -40,6 +42,23 @@ async function handlePlanted(req, res) {
 
   client.query(`UPDATE plants_in_garden SET quantity = $1, planted_at = $2 WHERE id = $3`, [quantity, date, plantID]);
   res.status(200).json({ response: "Planted!" });
+}
+
+async function handleGetShopping(req, res) {
+  const response = (await client.query(`SELECT * FROM shopping_list`)).rows;
+
+  res.status(200).json(response);
+}
+
+async function handleAddShopping(req, res) {
+  const { plantInfoID, gardenID, quantity } = req.body;
+
+  client.query(
+    `INSERT INTO shopping_list (plant_info_id, garden_id, quantity)
+  VALUES ($1, $2, $3)`,
+    [plantInfoID, gardenID, quantity]
+  );
+  res.status(200).json({ response: "Added" });
 }
 
 async function handleGetPlants(req, res) {
