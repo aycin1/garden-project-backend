@@ -85,21 +85,27 @@ async function handleGetPlants(req, res) {
   let filteredResults = [];
 
   if (queryObj.has("timeUntilHarvest")) {
-    results.forEach((plant, i) => {
-      let instructions = plant.harvest_instructions;
+    results.forEach(plant => {
+      let queriedTime = queryObj.get("timeUntilHarvest");
 
-      if (instructions.includes("weeks")) {
-        if (instructions.includes("-")) instructions = instructions.split("-")[1];
-        const maxDesiredWeeks = Number(queryObj.get("timeUntilHarvest"));
-        const maxActualWeeks = Number(instructions.replace(/[^0-9]/g, ""));
-        if (maxActualWeeks < maxDesiredWeeks) filteredResults.push(plant);
-      } else {
-        const overTwoYearsDesired = queryObj.get("timeUntilHarvest") == "24%2B"; // %2B is + in UTF-8
-        if (overTwoYearsDesired ? !instructions.includes("days") : instructions.includes("days")) {
-          filteredResults.push(plant);
-        }
-      }
+      const weeksQueriedAsMinimum = queriedTime.includes("g");
+      if (weeksQueriedAsMinimum) queriedTime = queriedTime.replace("g", "");
+      const DesiredWeeks = Number(queriedTime);
+
+      let instructions = plant.harvest_instructions;
+      if (instructions.includes("weeks")) instructions = instructions.split("weeks")[1];
+      if (instructions.includes("-")) instructions = instructions.split("-")[1];
+
+      let maxHarvestWeeks = Number(instructions.replace(/[^0-9]/g, ""));
+      if (instructions.includes("days")) maxHarvestWeeks /= 7;
+      if (instructions.includes("years")) maxHarvestWeeks *= 52;
+
+      if (!weeksQueriedAsMinimum && maxHarvestWeeks < DesiredWeeks) filteredResults.push(plant);
+      if (weeksQueriedAsMinimum && maxHarvestWeeks > DesiredWeeks) filteredResults.push(plant);
     });
+  }
+
+  if (queryObj.has("spacing")) {
   }
 
   if (!queryObj.has("timeUntilHarvest") && !queryObj.has("spacing")) filteredResults = results;
