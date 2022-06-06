@@ -41,6 +41,7 @@ app.post("/new-plant", handleNewPlant);
 app.post("/shopping-list", handleAddShopping);
 app.patch("/update-plant-status", handlePlanted);
 app.patch("/harvest", handleHarvest);
+app.patch("/update-quantity", handleQuantityChange);
 app.put("/garden/:id", handleUpdateGarden);
 app.delete("/:id/", handleDeletePlants);
 app.delete("/shopping-list/:id", handleDeleteShoppingListItem);
@@ -62,6 +63,16 @@ async function handleGetPlantByID(req, res) {
   const query = `SELECT name FROM plant_info WHERE id = $1`;
   const nameOfPlant = (await client.query(query, [id])).rows;
   res.json(nameOfPlant);
+}
+
+async function handleQuantityChange(req, res) {
+  const { quantity, id } = req.body;
+
+  client.query(`UPDATE shopping_list SET quantity = $1 WHERE id = $2`, [
+    quantity,
+    id,
+  ]);
+  res.status(200).json({ response: "Quantity changed!" });
 }
 
 async function handleGetShopping(req, res) {
