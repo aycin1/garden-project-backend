@@ -106,6 +106,22 @@ async function handleGetPlants(req, res) {
   }
 
   if (queryObj.has("spacing")) {
+    results.forEach(plant => {
+      let queriedSpacing = queryObj.get("spacing");
+
+      const spacingQueriedAsMinimum = queriedSpacing.includes("g");
+      if (spacingQueriedAsMinimum) queriedSpacing = queriedSpacing.replace("g", "");
+      const DesiredSpacing = Number(queriedSpacing);
+
+      let instructions = plant.space_instructions;
+      if (instructions.includes("-")) instructions = instructions.split("-")[1];
+
+      let maxSpacing = instructions.replace(/[^0-9]/g, "");
+      if (instructions.includes("Metre")) maxSpacing *= 39;
+
+      if (!spacingQueriedAsMinimum && maxSpacing < DesiredSpacing) filteredResults.push(plant);
+      if (spacingQueriedAsMinimum && maxSpacing > DesiredSpacing) filteredResults.push(plant);
+    });
   }
 
   if (!queryObj.has("timeUntilHarvest") && !queryObj.has("spacing")) filteredResults = results;
