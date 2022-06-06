@@ -6,20 +6,12 @@ const { Client } = require("pg");
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-const connection =
-  "postgres://ykwcpoaf:6xDkZhVpuLgvSLqxW-wJSfs_mkVQeyqt@surus.db.elephantsql.com/ykwcpoaf";
+const connection = "postgres://ykwcpoaf:6xDkZhVpuLgvSLqxW-wJSfs_mkVQeyqt@surus.db.elephantsql.com/ykwcpoaf";
 const client = new Client(connection);
 client.connect();
 
 const corsSettings = {
-  allowedHeaders: [
-    "Access-Control-Allow-Origin",
-    "Authorization",
-    "Content-Type",
-    "Accept",
-    "Origin",
-    "User-Agent",
-  ],
+  allowedHeaders: ["Access-Control-Allow-Origin", "Authorization", "Content-Type", "Accept", "Origin", "User-Agent"],
   credentials: true,
 };
 
@@ -46,10 +38,7 @@ app.listen(PORT, () => console.log("listening on port " + PORT));
 async function handlePlanted(req, res) {
   const { plantID, quantity, date } = req.body;
 
-  client.query(
-    `UPDATE plants_in_garden SET quantity = $1, planted_at = $2 WHERE id = $3`,
-    [quantity, date, plantID]
-  );
+  client.query(`UPDATE plants_in_garden SET quantity = $1, planted_at = $2 WHERE id = $3`, [quantity, date, plantID]);
   res.status(200).json({ response: "Planted!" });
 }
 
@@ -58,39 +47,36 @@ async function handleGetPlants(req, res) {
   const queryObj = new URLSearchParams(queryParams);
 
   let tempArr = [];
-  let parameterNames = [
-    "name",
-    "plantClassification",
-    "sowingSeason",
-    "harvestingSeason",
-    "timeFromSowToHarvest",
-    "spacing",
-  ];
+  let parameterNames = ["name", "classification", "sowingSeason", "timeFromSowToHarvest", "spacing"];
 
   for (let i = 0; i < parameterNames.length; i++) {
     const parameterName = parameterNames[i];
-    const parameterValue = queryObj.has(parameterName)
-      ? queryObj.get(parameterName)
-      : undefined;
+    const parameterValue = queryObj.has(parameterName) ? queryObj.get(parameterName) : undefined;
     tempArr.push(parameterValue);
   }
 
-  let [
-    name,
-    plantClassification,
-    sowingSeason,
-    harvestingSeason,
-    timeFromSowToHarvest,
-    spacing,
-  ] = tempArr;
+  let [name, classification, sowingSeason, timeFromSowToHarvest, spacing] = tempArr;
 
-  const replacementFields = ["$1", "$2", "$3", "$4", "$5", "$6"];
+  const replacementFields = ["$1", "$2", "$3", "$4", "$5"];
   const replacementValues = [];
+  const totalPossibleFields = replacementFields.length;
 
   let dbQuery = "SELECT * FROM plant_info";
   if (name) {
-    dbQuery += ` WHERE (name LIKE '%' || ${replacementFields.shift()} || '%')`;
+    dbQuery += ` WHERE (name ILIKE '%' || ${replacementFields.shift()} || '%')`;
     replacementValues.push(name);
+  }
+  if (classification) {
+    if (replacementFields.length < totalPossibleFields) dbQuery += ` AND`;
+    else dbQuery += ` WHERE`;
+    dbQuery += ` classification ILIKE ${replacementFields.shift()}`;
+    replacementValues.push(classification);
+  }
+  if (sowingSeason) {
+    if (replacementFields.length < totalPossibleFields) dbQuery += ` AND`;
+    else dbQuery += ` WHERE`;
+    dbQuery += ` (sowingTimes ILIKE '%' || ${replacementFields.shift()} || '%')`;
+    replacementValues.push(sowingSeason);
   }
 
   const results = (await client.query(dbQuery, replacementValues)).rows;
@@ -131,10 +117,7 @@ async function handleNewPlant(req, res) {
 
 async function handleHarvest(req, res) {
   const { plantID } = req.body;
-  await client.query(
-    `UPDATE plants_in_garden SET harvested = true WHERE id = $1`,
-    [plantID]
-  );
+  await client.query(`UPDATE plants_in_garden SET harvested = true WHERE id = $1`, [plantID]);
 
   res.status(200).json("Harvest registered!");
 }
@@ -143,10 +126,7 @@ async function handleUpdateGarden(req, res) {
   const id = req.params.id;
   const { name, location } = req.body;
   try {
-    client.query(
-      `UPDATE gardens SET garden_name = $1, location = $2 WHERE id = $3`,
-      [name, location, id]
-    );
+    client.query(`UPDATE gardens SET garden_name = $1, location = $2 WHERE id = $3`, [name, location, id]);
   } catch (e) {
     return res.status(500).json({ error: e });
   }
