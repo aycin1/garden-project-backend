@@ -39,6 +39,7 @@ app.patch("/update-plant-status", handlePlanted);
 app.patch("/harvest", handleHarvest);
 app.put("/garden/:id", handleUpdateGarden);
 app.delete("/:id/", handleDeletePlants);
+app.delete("/shopping-list/:id", handleDeleteShoppingListItem);
 
 app.listen(PORT, () => console.log("listening on port " + PORT));
 
@@ -152,4 +153,10 @@ async function handleUpdateGarden(req, res) {
   res.status(200).json("Garden updated!");
 }
 
+async function handleDeleteShoppingListItem(req, res) {
+  const id = req.params.id;
+  const query = `DELETE FROM shopping_list WHERE id = $1`;
+  await client.query(query, [id]);
+  res.status(200).json({ response: "Deleted successfully" });
+}
 // This comment is to restart the server after a bad request
