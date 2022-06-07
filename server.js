@@ -1,9 +1,9 @@
-import { v4 as uuidv4 } from "uuid";
 const express = require("express");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const hasher = require("pbkdf2-password-hash");
+const uuid = require("uuid");
 const { Client } = require("pg");
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -72,20 +72,20 @@ async function handleGetShopping(req, res) {
 
 async function handleLogin(req, res) {
   const { email, password } = req.body;
-  const user = (await client.query(`SELECT * FROM users WHERE email = $1`, [email])).rows;
+  const user = (await client.query(`SELECT * FROM users WHERE email = $1`, [email])).rows[0];
 
-  passwordIsValid = hasher.compare(password, user.hashedPassword);
+  passwordIsValid = hasher.compare(password, user.hashed_password);
 
   if (passwordIsValid) {
-    const sessionID = uuidv4();
+    const sessionID = uuid.v4();
 
     client.query(
-      `INSERT INTO sessions (uuid, userID, created_at)
+      `INSERT INTO sessions (uuid, user_id, created_at)
     VALUES ($1, $2, NOW())`,
-      [sessionID.user.id]
+      [sessionID, user.id]
     );
 
-    res.cookie("session", sessionID);
+    res.cookie("session", sessionID).send();
   } else {
     res.json({ response: "Username or password is incorrect." });
   }
