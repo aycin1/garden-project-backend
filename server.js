@@ -1,7 +1,9 @@
+import { v4 as uuidv4 } from "uuid";
 const express = require("express");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const hasher = require("pbkdf2-password-hash");
 const { Client } = require("pg");
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -29,6 +31,7 @@ app.get("/plants/:id", handleGetPlantByID);
 app.get("/garden/:id", handleGetGarden);
 app.get("/shopping-list", handleGetShopping);
 app.get("/gardens/:id", handleGetGardensForUser);
+app.post("/login", handleLogin);
 app.post("/new-plant", handleNewPlant);
 app.post("/shopping-list", handleAddShopping);
 app.patch("/update-plant-status", handlePlanted);
@@ -65,6 +68,27 @@ async function handleGetShopping(req, res) {
   const response = (await client.query(`SELECT * FROM shopping_list ORDER BY plant_info_id`)).rows;
 
   res.status(200).json(response);
+}
+
+async function handleLogin(req, res) {
+  const { email, password } = req.body;
+  const user = (await client.query(`SELECT * FROM users WHERE email = $1`, [email])).rows;
+
+  passwordIsValid = hasher.compare(password, user.hashedPassword);
+
+  if (passwordIsValid) {
+    const sessionID = uuidv4();
+
+    client.query(
+      `INSERT INTO sessions (uuid, userID, created_at)
+    VALUES ($1, $2, NOW())`,
+      [sessionID.user.id]
+    );
+
+    res.cookie("session", sessionID);
+  } else {
+    res.json({ response: "Username or password is incorrect." });
+  }
 }
 
 async function handleGetGardensForUser(req, res) {
