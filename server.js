@@ -54,8 +54,8 @@ app.delete("/shopping-list/:id", handleDeleteShoppingListItem);
 app.listen(PORT, () => console.log("listening on port " + PORT));
 
 async function hashPassword(password) {
-  const salt = "we_love_gardens";
-  const hashedPassword = await hasher.hash(password, salt);
+//   const salt = "we_love_gardens";
+  const hashedPassword = await hasher.hash(password); //can add salt later if we have time to/want to
   return hashedPassword;
 }
 
