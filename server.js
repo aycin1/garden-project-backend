@@ -52,37 +52,39 @@ app.delete("/shopping-list/:id", handleDeleteShoppingListItem);
 
 app.listen(PORT, () => console.log("listening on port " + PORT));
 
+async function hashPassword(password) {
+  const salt = "we_love_gardens";
+  const hashedPassword = await hasher.hash(password, salt);
+  return hashedPassword;
+}
+
 async function handleRegisteringUser(req, res) {
   const { firstName, lastName, email, password, passwordConfirmation } =
-    req.body;
+    await req.body;
 
   if (firstName && lastName && email && password && passwordConfirmation) {
     if (password === passwordConfirmation) {
-      async function hashPassword(password) {
-        const salt = "we_love_gardens!";
-        const hashedPassword = await hasher.hash(password, [salt]);
-        return hashedPassword;
-      }
+      const hashedPassword = await hashPassword(password);
 
       try {
-        client.query(
+        await client.query(
           `INSERT INTO users (first_name, last_name, email, hashed_password, created_at) VALUES ($1, $2, $3, $4, NOW())`,
-          [firstName, lastName, email, hashPassword(password)]
+          [firstName, lastName, email, hashedPassword]
         );
 
-        return res.status(200).json({ response: "Account created!" });
+        await res.status(200).json({ response: "Account created!" });
       } catch (error) {
-        return res
+        await res
           .status(400)
           .json({ error: "An account already exists for this email!" });
       }
     } else {
-      return res
+      await res
         .status(400)
         .json({ error: "Passwords do not match, please try again" });
     }
   } else {
-    return res.status(400).json({ error: "Please provide all data required!" });
+    await res.status(400).json({ error: "Please provide all data required!" });
   }
 }
 
