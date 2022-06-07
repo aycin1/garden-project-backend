@@ -38,6 +38,7 @@ app.patch("/update-plant-status", handlePlanted);
 app.patch("/harvest", handleHarvest);
 app.patch("/update-quantity", handleQuantityChange);
 app.put("/garden/:id", handleUpdateGarden);
+app.delete("/logout", handleLogout);
 app.delete("/:id/", handleDeletePlants);
 app.delete("/shopping-list/:id", handleDeleteShoppingListItem);
 
@@ -204,6 +205,17 @@ async function handleGetGarden(req, res) {
   const query = `SELECT plants_in_garden.id, plant_info_id, name, planted_at, harvested, estimated_harvest_date, quantity, location FROM plant_info JOIN plants_in_garden ON plant_info.id = plants_in_garden.plant_info_id JOIN gardens ON plants_in_garden.garden_id = gardens.id WHERE gardens.id = $1 ORDER BY plant_info.id`;
   const garden = (await client.query(query, [id])).rows;
   res.json(garden);
+}
+
+async function handleLogout(req, res) {
+  const cookies = req.cookies;
+  if (cookies === undefined) res.status(400).json({ error: "No Session Cookies Found" });
+  const sessionID = cookies.session;
+
+  client.query(`DELETE FROM sessions WHERE uuid = $1`, [sessionID]);
+  res.cookie("session", sessionID, { maxAge: 0 }).send();
+
+  res.status(200).json({ response: "Session Deleted" });
 }
 
 async function handleDeletePlants(req, res) {
