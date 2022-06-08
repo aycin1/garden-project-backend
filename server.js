@@ -111,10 +111,16 @@ async function handlePlanted(req, res) {
     } else avgWeeks = Number(harvest_instructions.replace(/[^0-9]/g, ""));
   }
 
-  res.json({ avgWeeks });
+  // add some validation for the date
+  const planted_at = new Date(date);
+  const estimated_harvest_date = new Date(date);
+  estimated_harvest_date.setDate(estimated_harvest_date.getDate() + avgWeeks * 7);
 
-  // client.query(`UPDATE plants_in_garden SET quantity = $1, planted_at = $2 WHERE id = $3`, [quantity, date, plantID]);
-  // res.status(200).json({ response: "Planted!" });
+  client.query(
+    `UPDATE plants_in_garden SET quantity = $1, planted_at = $2, estimated_harvest_date = $3 WHERE id = $4`,
+    [quantity, planted_at, estimated_harvest_date, plantID]
+  );
+  res.status(200).json({ response: "Planted!" });
 }
 
 async function handleBoughtChange(req, res) {
