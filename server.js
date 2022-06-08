@@ -100,16 +100,18 @@ async function handlePlanted(req, res) {
     )
   ).rows[0].harvest_instructions;
 
+  let avgWeeks;
   if (harvest_instructions.includes("weeks")) {
-    let avgWeeks;
-    harvest_instructions = harvest_instructions.split("weeks")[0];
-    if (harvest_instructions.includes("-")) {
-      const weeks = instructions.split("-")[0];
-      //avg week = ...
+    weeksStr = harvest_instructions.split("weeks")[0];
+    if (weeksStr.includes("-")) {
+      const weeks = weeksStr.split("-").map(str => Number(str.replace(/^[0-9]/g, "")));
+      const minWeek = weeks[0];
+      const maxWeek = weeks[1];
+      avgWeeks = (minWeek + maxWeek) / 2;
     } else avgWeeks = Number(harvest_instructions.replace(/^[0-9]/g, ""));
   }
 
-  res.json({ harvest_instructions });
+  res.json({ avgWeeks });
 
   // client.query(`UPDATE plants_in_garden SET quantity = $1, planted_at = $2 WHERE id = $3`, [quantity, date, plantID]);
   // res.status(200).json({ response: "Planted!" });
