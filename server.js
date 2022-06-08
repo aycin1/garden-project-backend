@@ -125,7 +125,7 @@ async function handleLogin(req, res) {
   const { email, password } = req.body;
   const user = (await client.query(`SELECT * FROM users WHERE email = $1`, [email])).rows[0];
 
-  passwordIsValid = hasher.compare(password, user.hashed_password);
+  passwordIsValid = await hasher.compare(password, user.hashed_password);
   if (passwordIsValid) {
     const sessionID = uuid.v4();
 
