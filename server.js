@@ -48,7 +48,6 @@ app.delete("/shopping-list/:id", handleDeleteShoppingListItem);
 
 app.listen(PORT, () => console.log("listening on port " + PORT));
 
-
 async function handleAddGarden(req, res) {
   const { location, garden_name, sessionID } = req.body;
   const id = (await client.query(`SELECT user_id FROM sessions WHERE uuid = $1`, [sessionID])).rows[0]["user_id"];
@@ -59,19 +58,18 @@ async function handleAddGarden(req, res) {
     [id, garden_name, location]
   );
   res.status(200).json({ response: "Added" });
+}
 
 async function handleGetIdAndGardensForUser(req, res) {
   const { sessionID } = req.body;
 
   const response = (
-    await client.query(
-      `SELECT * FROM gardens JOIN sessions ON sessions.user_id = gardens.user_id WHERE uuid = $1`,
-      [sessionID]
-    )
+    await client.query(`SELECT * FROM gardens JOIN sessions ON sessions.user_id = gardens.user_id WHERE uuid = $1`, [
+      sessionID,
+    ])
   ).rows;
 
   res.status(200).json(response);
-
 }
 
 async function handleValidateSession(req, res) {
