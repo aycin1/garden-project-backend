@@ -13,6 +13,7 @@ const client = new Client(connection);
 client.connect();
 
 const corsSettings = {
+  origin: ["http://localhost:3000", "https://garden-project-website.sigmalabs.co.uk/"],
   allowedHeaders: ["Access-Control-Allow-Origin", "Authorization", "Content-Type", "Accept", "Origin", "User-Agent"],
   credentials: true,
 };
@@ -250,14 +251,12 @@ async function handleGetGarden(req, res) {
 }
 
 async function handleLogout(req, res) {
-  const cookies = req.cookies;
-  if (cookies === undefined) res.status(400).json({ error: "No Session Cookies Found" });
-  const sessionID = cookies.session;
-
-  client.query(`DELETE FROM sessions WHERE uuid = $1`, [sessionID]);
-  res.cookie("session", sessionID, { maxAge: 0 }).send();
-
-  res.status(200).json({ response: "Session Deleted" });
+  const { sessionID } = req.body;
+  if (!sessionID) res.status(400).json({ error: "No Session Data Found" });
+  else {
+    client.query(`DELETE FROM sessions WHERE uuid = $1`, [sessionID]);
+    res.status(200).json({ response: "Session Deleted" });
+  }
 }
 
 async function handleDeletePlants(req, res) {
