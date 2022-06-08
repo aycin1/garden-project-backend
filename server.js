@@ -313,4 +313,4 @@ async function handleDeleteShoppingListItem(req, res) {
   await client.query(query, [id]);
   res.status(200).json({ response: "Deleted successfully" });
 }
-// This comment is to restart the server after a bad request
+// This comment is to restart the server after a bad request 1
