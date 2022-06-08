@@ -125,20 +125,20 @@ async function handleLogin(req, res) {
   const { email, password } = req.body;
   const user = (await client.query(`SELECT * FROM users WHERE email = $1`, [email])).rows[0];
 
-  passwordIsValid = await hasher.compare(password, user.hashed_password);
-  if (passwordIsValid) {
-    const sessionID = uuid.v4();
+  if (user) {
+    const passwordIsValid = hasher.compare(password, user.hashed_password);
+    if (await passwordIsValid) {
+      const sessionID = uuid.v4();
 
-    client.query(
-      `INSERT INTO sessions (uuid, user_id, created_at)
+      client.query(
+        `INSERT INTO sessions (uuid, user_id, created_at)
     VALUES ($1, $2, NOW())`,
-      [sessionID, user.id]
-    );
+        [sessionID, user.id]
+      );
 
-    res.json({ session: sessionID });
-  } else {
-    res.json({ response: "Username or password is incorrect." });
-  }
+      res.json({ session: sessionID });
+    } else res.json({ response: "Username or password is incorrect." });
+  } else res.json({ response: "Username or password is incorrect." });
 }
 
 async function handleGetGardensForUser(req, res) {
@@ -313,4 +313,4 @@ async function handleDeleteShoppingListItem(req, res) {
   await client.query(query, [id]);
   res.status(200).json({ response: "Deleted successfully" });
 }
-// This comment is to restart the server after a bad request
+// This comment is to restart the server after a bad request 1
