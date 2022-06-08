@@ -90,8 +90,20 @@ async function handleRegisteringUser(req, res) {
 async function handlePlanted(req, res) {
   const { plantID, quantity, date } = req.body;
 
-  client.query(`UPDATE plants_in_garden SET quantity = $1, planted_at = $2 WHERE id = $3`, [quantity, date, plantID]);
-  res.status(200).json({ response: "Planted!" });
+  const harvest_instructions = (
+    await client.query(
+      `SELECT harvest_instructions FROM plants_in_garden
+  JOIN plant_info
+  ON plants_in_garden.plant_info_id = plant_info.id
+  WHERE plants_in_garden.id = $1`,
+      [plantID]
+    )
+  ).rows[0].harvest_instructions;
+
+  res.json({ harvest_instructions });
+
+  // client.query(`UPDATE plants_in_garden SET quantity = $1, planted_at = $2 WHERE id = $3`, [quantity, date, plantID]);
+  // res.status(200).json({ response: "Planted!" });
 }
 
 async function handleBoughtChange(req, res) {
