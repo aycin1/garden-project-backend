@@ -30,6 +30,7 @@ app.get("/plants", handleGetPlants);
 app.get("/plants/:id", handleGetPlantByID);
 app.get("/garden/:id", handleGetGarden);
 app.get("/shopping-list", handleGetShopping);
+app.get("/get-user", handleGetUser);
 app.get("/allGardens/:id", handleGetGardensForUser);
 app.post("/allGardens", handleGetIdAndGardensForUser);
 app.post("/validate-session", handleValidateSession);
@@ -47,6 +48,13 @@ app.delete("/:id/", handleDeletePlants);
 app.delete("/shopping-list/:id", handleDeleteShoppingListItem);
 
 app.listen(PORT, () => console.log("listening on port " + PORT));
+
+async function handleGetUser(req, res) {
+  const session = req.params;
+  console.log(session);
+  const userID = (await client.query(`SELECT user_id FROM sessions WHERE uuid = $1`, [session])).rows[0].user_id;
+  res.status(200).json({ userID });
+}
 
 async function handleAddGarden(req, res) {
   const { location, garden_name, sessionID } = req.body;
