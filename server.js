@@ -104,13 +104,11 @@ async function handlePlanted(req, res) {
   if (harvest_instructions.includes("weeks")) {
     weeksStr = harvest_instructions.split("weeks")[0];
     if (weeksStr.includes("-")) {
-      console.log(weeksStr);
-      const weeks = weeksStr.split("-").map(str => Number(str.replace(/^[0-9]/g, "")));
-      console.log(weeks);
+      const weeks = weeksStr.split("-").map(str => Number(str.replace(/[^0-9]/g, "")));
       const minWeek = weeks[0];
       const maxWeek = weeks[1];
       avgWeeks = (minWeek + maxWeek) / 2;
-    } else avgWeeks = Number(harvest_instructions.replace(/^[0-9]/g, ""));
+    } else avgWeeks = Number(harvest_instructions.replace(/[^0-9]/g, ""));
   }
 
   res.json({ avgWeeks });
