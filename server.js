@@ -13,7 +13,11 @@ const client = new Client(connection);
 client.connect();
 
 const corsSettings = {
-  origin: ["http://localhost:3000", "https://garden-project-website.sigmalabs.co.uk/"],
+  origin: [
+    "http://localhost:3000",
+    "https://garden-project-website.sigmalabs.co.uk/",
+    "https://garden-project-website.sigmalabs.co.uk/plants-info",
+  ],
   allowedHeaders: ["Access-Control-Allow-Origin", "Authorization", "Content-Type", "Accept", "Origin", "User-Agent"],
   credentials: true,
 };
