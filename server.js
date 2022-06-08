@@ -42,12 +42,12 @@ app.get("/plants/:id", handleGetPlantByID);
 app.get("/garden/:id", handleGetGarden);
 app.get("/shopping-list", handleGetShopping);
 app.get("/gardens/:id", handleGetGardensForUser);
+app.post("/gardens", handleGetIdAndGardensForUser);
 app.post("/validate-session", handleValidateSession);
 app.post("/sign-up", handleRegisteringUser);
 app.post("/login", handleLogin);
 app.post("/new-plant", handleNewPlant);
 app.post("/shopping-list", handleAddShopping);
-app.post("/new-garden", handleAddGarden);
 app.patch("/update-plant-status", handlePlanted);
 app.patch("/harvest", handleHarvest);
 app.patch("/update-quantity", handleQuantityChange);
@@ -59,21 +59,19 @@ app.delete("/shopping-list/:id", handleDeleteShoppingListItem);
 
 app.listen(PORT, () => console.log("listening on port " + PORT));
 
-async function handleAddGarden(req, res) {
-  const { location, garden_name, sessionID } = req.body;
-  const id = (
-    await client.query(`SELECT user_id FROM sessions WHERE uuid = $1`, [
-      sessionID,
-    ])
-  ).rows[0]["user_id"];
-  console.log(id);
-  await client.query(
-    `INSERT INTO gardens (user_id, garden_name, location)
-  VALUES ($1, $2, $3)`,
-    [id, garden_name, location]
-  );
-  res.status(200).json({ response: "Added" });
+async function handleGetIdAndGardensForUser(req, res) {
+  const { sessionID } = req.body;
+
+  const response = (
+    await client.query(
+      `SELECT * FROM gardens JOIN sessions ON sessions.user_id = gardens.user_id WHERE uuid = $1`,
+      [sessionID]
+    )
+  ).rows;
+
+  res.status(200).json(response);
 }
+
 async function handleValidateSession(req, res) {
   const { sessionID } = req.body;
   const session = (
@@ -309,7 +307,7 @@ async function handleGetPlants(req, res) {
 
 async function handleGetGarden(req, res) {
   const id = req.params.id;
-  const query = `SELECT plants_in_garden.id, garden_name, plant_info_id, name, planted_at, harvested, estimated_harvest_date, quantity, location FROM plant_info JOIN plants_in_garden ON plant_info.id = plants_in_garden.plant_info_id JOIN gardens ON plants_in_garden.garden_id = gardens.id WHERE gardens.id = $1 ORDER BY plant_info.id`;
+  const query = `SELECT plants_in_garden.id, plant_info_id, name, planted_at, harvested, estimated_harvest_date, quantity, location FROM plant_info JOIN plants_in_garden ON plant_info.id = plants_in_garden.plant_info_id JOIN gardens ON plants_in_garden.garden_id = gardens.id WHERE gardens.id = $1 ORDER BY plant_info.id`;
   const garden = (await client.query(query, [id])).rows;
   res.json(garden);
 }
