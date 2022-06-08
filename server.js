@@ -19,7 +19,6 @@ const corsSettings = {
     "https://garden-project-website.sigmalabs.co.uk/plants-info",
   ],
   allowedHeaders: ["Access-Control-Allow-Origin", "Authorization", "Content-Type", "Accept", "Origin", "User-Agent"],
-  credentials: true,
 };
 
 app.use(cookieParser());
@@ -141,7 +140,6 @@ async function handleLogin(req, res) {
     );
 
     res.json({ session: sessionID });
-    document.cookie = "session=" + res.json().sessionID;
   } else {
     res.json({ response: "Username or password is incorrect." });
   }
