@@ -119,7 +119,6 @@ async function handleLogin(req, res) {
   const user = (await client.query(`SELECT * FROM users WHERE email = $1`, [email])).rows[0];
 
   passwordIsValid = hasher.compare(password, user.hashed_password);
-
   if (passwordIsValid) {
     const sessionID = uuid.v4();
 
@@ -307,4 +306,4 @@ async function handleDeleteShoppingListItem(req, res) {
   await client.query(query, [id]);
   res.status(200).json({ response: "Deleted successfully" });
 }
-// This comment is to restart the server after a bad request 1
+// This comment is to restart the server after a bad request
