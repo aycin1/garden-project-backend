@@ -40,6 +40,7 @@ app.post("/shopping-list", handleAddShopping);
 app.patch("/update-plant-status", handlePlanted);
 app.patch("/harvest", handleHarvest);
 app.patch("/update-quantity", handleQuantityChange);
+app.patch("/update-bought", handleBoughtChange);
 app.put("/garden/:id", handleUpdateGarden);
 app.delete("/logout", handleLogout);
 app.delete("/:id/", handleDeletePlants);
@@ -92,6 +93,16 @@ async function handlePlanted(req, res) {
 
   client.query(`UPDATE plants_in_garden SET quantity = $1, planted_at = $2 WHERE id = $3`, [quantity, date, plantID]);
   res.status(200).json({ response: "Planted!" });
+}
+
+async function handleBoughtChange(req, res) {
+  const { bought, id } = req.body;
+
+  client.query(`UPDATE shopping_list SET bought = $1 WHERE id = $2`, [
+    bought,
+    id,
+  ]);
+  res.status(200).json({ response: "Bought changed!" });
 }
 
 async function handleGetPlantByID(req, res) {
@@ -206,7 +217,8 @@ async function handleGetPlants(req, res) {
 
       let instructions = plant.harvest_instructions;
 
-      if (instructions.includes("weeks")) instructions = instructions.split("weeks")[0];
+      if (instructions.includes("weeks"))
+        instructions = instructions.split("weeks")[0];
       if (instructions.includes("-")) instructions = instructions.split("-")[0];
       let maxHarvestWeeks = Number(instructions.replace(/[^0-9]/g, ""));
 
@@ -219,8 +231,10 @@ async function handleGetPlants(req, res) {
   }
 
   if (queryObj.has("spacing")) {
-    resultsToFilter = queryObj.has("timeUntilHarvest") ? filteredResults : results; // So that results are nor reintroduced
-    resultsToFilter.forEach(plant => {
+    resultsToFilter = queryObj.has("timeUntilHarvest")
+      ? filteredResults
+      : results; // So that results are nor reintroduced
+    resultsToFilter.forEach((plant) => {
       let queriedSpacing = queryObj.get("spacing");
 
       const spacingQueriedAsMinimum = queriedSpacing.includes("g");
@@ -233,8 +247,10 @@ async function handleGetPlants(req, res) {
       let maxSpacing = instructions.replace(/[^0-9]/g, "");
       if (instructions.includes("Metre")) maxSpacing *= 39;
 
+
       if (!spacingQueriedAsMinimum && maxSpacing <= DesiredSpacing) filteredResults.push(plant);
       if (spacingQueriedAsMinimum && maxSpacing >= DesiredSpacing) filteredResults.push(plant);
+
     });
   }
 
