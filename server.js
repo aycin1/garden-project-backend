@@ -98,10 +98,7 @@ async function handlePlanted(req, res) {
 async function handleBoughtChange(req, res) {
   const { bought, id } = req.body;
 
-  client.query(`UPDATE shopping_list SET bought = $1 WHERE id = $2`, [
-    bought,
-    id,
-  ]);
+  client.query(`UPDATE shopping_list SET bought = $1 WHERE id = $2`, [bought, id]);
   res.status(200).json({ response: "Bought changed!" });
 }
 
@@ -139,7 +136,8 @@ async function handleLogin(req, res) {
       [sessionID, user.id]
     );
 
-    res.cookie("session", sessionID).send();
+    res.json({ session: sessionID });
+    document.cookie = "session=" + res.json().sessionID;
   } else {
     res.json({ response: "Username or password is incorrect." });
   }
@@ -216,8 +214,7 @@ async function handleGetPlants(req, res) {
 
       let instructions = plant.harvest_instructions;
 
-      if (instructions.includes("weeks"))
-        instructions = instructions.split("weeks")[0];
+      if (instructions.includes("weeks")) instructions = instructions.split("weeks")[0];
       if (instructions.includes("-")) instructions = instructions.split("-")[0];
       let maxHarvestWeeks = Number(instructions.replace(/[^0-9]/g, ""));
 
@@ -230,10 +227,8 @@ async function handleGetPlants(req, res) {
   }
 
   if (queryObj.has("spacing")) {
-    resultsToFilter = queryObj.has("timeUntilHarvest")
-      ? filteredResults
-      : results; // So that results are nor reintroduced
-    resultsToFilter.forEach((plant) => {
+    resultsToFilter = queryObj.has("timeUntilHarvest") ? filteredResults : results; // So that results are nor reintroduced
+    resultsToFilter.forEach(plant => {
       let queriedSpacing = queryObj.get("spacing");
 
       const spacingQueriedAsMinimum = queriedSpacing.includes("g");
@@ -246,10 +241,8 @@ async function handleGetPlants(req, res) {
       let maxSpacing = instructions.replace(/[^0-9]/g, "");
       if (instructions.includes("Metre")) maxSpacing *= 39;
 
-
       if (!spacingQueriedAsMinimum && maxSpacing <= DesiredSpacing) filteredResults.push(plant);
       if (spacingQueriedAsMinimum && maxSpacing >= DesiredSpacing) filteredResults.push(plant);
-
     });
   }
 
@@ -322,4 +315,4 @@ async function handleDeleteShoppingListItem(req, res) {
   await client.query(query, [id]);
   res.status(200).json({ response: "Deleted successfully" });
 }
-// This comment is to restart the server after a bad request
+// This comment is to restart the server after a bad request 1
