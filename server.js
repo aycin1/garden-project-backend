@@ -47,6 +47,7 @@ app.post("/sign-up", handleRegisteringUser);
 app.post("/login", handleLogin);
 app.post("/new-plant", handleNewPlant);
 app.post("/shopping-list", handleAddShopping);
+app.post("/new-garden", handleAddGarden);
 app.patch("/update-plant-status", handlePlanted);
 app.patch("/harvest", handleHarvest);
 app.patch("/update-quantity", handleQuantityChange);
@@ -58,6 +59,21 @@ app.delete("/shopping-list/:id", handleDeleteShoppingListItem);
 
 app.listen(PORT, () => console.log("listening on port " + PORT));
 
+async function handleAddGarden(req, res) {
+  const { location, garden_name, sessionID } = req.body;
+  const id = (
+    await client.query(`SELECT user_id FROM sessions WHERE uuid = $1`, [
+      sessionID,
+    ])
+  ).rows[0]["user_id"];
+  console.log(id);
+  await client.query(
+    `INSERT INTO gardens (user_id, garden_name, location)
+  VALUES ($1, $2, $3)`,
+    [id, garden_name, location]
+  );
+  res.status(200).json({ response: "Added" });
+}
 async function handleValidateSession(req, res) {
   const { sessionID } = req.body;
   const session = (
