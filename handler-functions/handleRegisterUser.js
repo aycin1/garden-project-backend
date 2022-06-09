@@ -6,7 +6,7 @@ async function hashPassword(password) {
   return hashedPassword;
 }
 
-export default async function handleRegisterUser(req, res) {
+async function handleRegisterUser(req, res) {
   const { firstName, lastName, email, password, passwordConfirmation } = await req.body;
 
   if (firstName && lastName && email && password && passwordConfirmation) {
@@ -30,3 +30,5 @@ export default async function handleRegisterUser(req, res) {
     await res.status(400).json({ error: "Please provide all data required!" });
   }
 }
+
+module.exports = { handleRegisterUser };

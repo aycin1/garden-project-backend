@@ -4,3 +4,5 @@ export default async function handleGetGarden(req, res) {
   const garden = (await client.query(query, [id])).rows;
   res.json(garden);
 }
+
+module.exports = { handleGetGarden };

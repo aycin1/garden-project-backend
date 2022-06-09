@@ -1,4 +1,4 @@
-export default async function handleGetHarvestDates(req, res) {
+async function handleGetHarvestDates(req, res) {
   const userID = req.params.user;
 
   const plants = (
@@ -29,3 +29,5 @@ export default async function handleGetHarvestDates(req, res) {
 
   res.status(200).json(harvestDateInfo);
 }
+
+module.exports = { handleGetHarvestDates };

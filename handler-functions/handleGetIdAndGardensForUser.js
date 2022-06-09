@@ -1,4 +1,4 @@
-export default async function handleGetIdAndGardensForUser(req, res) {
+async function handleGetIdAndGardensForUser(req, res) {
   const { sessionID } = req.body;
 
   const response = (
@@ -10,3 +10,5 @@ export default async function handleGetIdAndGardensForUser(req, res) {
 
   res.status(200).json(response);
 }
+
+module.exports = { handleGetIdAndGardensForUser };

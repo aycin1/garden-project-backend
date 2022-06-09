@@ -1,4 +1,4 @@
-export default async function handleAddShopping(req, res) {
+async function handleAddShopping(req, res) {
   const { plantInfoID, gardenID, quantity } = req.body;
 
   client.query(
@@ -8,3 +8,5 @@ export default async function handleAddShopping(req, res) {
   );
   res.status(200).json({ response: "Added" });
 }
+
+module.exports = { handleAddShopping };

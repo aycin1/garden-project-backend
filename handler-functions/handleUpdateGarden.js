@@ -1,4 +1,4 @@
-export default async function handleUpdateGarden(req, res) {
+async function handleUpdateGarden(req, res) {
   const id = req.params.id;
   const { name, location } = req.body;
   try {
@@ -8,3 +8,5 @@ export default async function handleUpdateGarden(req, res) {
   }
   res.status(200).json("Garden updated!");
 }
+
+module.exports = { handleUpdateGarden };

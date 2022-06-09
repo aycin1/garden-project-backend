@@ -1,4 +1,4 @@
-export default async function handlePlanted(req, res) {
+async function handlePlanted(req, res) {
   const { plantID, quantity, date } = req.body;
 
   const harvest_instructions = (
@@ -33,3 +33,5 @@ export default async function handlePlanted(req, res) {
   );
   res.status(200).json({ response: "Planted!" });
 }
+
+module.exports = { handlePlanted };

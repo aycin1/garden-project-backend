@@ -87,3 +87,5 @@ async function handleGetPlants(req, res) {
 
   res.json(filteredResults);
 }
+
+module.exports = { handleGetPlants };

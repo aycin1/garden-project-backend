@@ -4,3 +4,5 @@ export default async function handleDeleteShoppingListItem(req, res) {
   await client.query(query, [id]);
   res.status(200).json({ response: "Deleted successfully" });
 }
+
+module.exports = { handleDeleteShoppingListItem };

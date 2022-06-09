@@ -1,4 +1,4 @@
-export default async function handleNewPlant(req, res) {
+async function handleNewPlant(req, res) {
   const { plantInfoID, gardenID } = req.body;
 
   try {
@@ -14,3 +14,5 @@ export default async function handleNewPlant(req, res) {
 
   res.status(200).json("Plant Added!");
 }
+
+module.exports = { handleNewPlant };

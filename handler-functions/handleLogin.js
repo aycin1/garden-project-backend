@@ -1,6 +1,6 @@
 const uuid = require("uuid");
 
-export default async function handleLogin(req, res) {
+async function handleLogin(req, res) {
   const { email, password } = req.body;
   const user = (await client.query(`SELECT * FROM users WHERE email = $1`, [email])).rows[0];
 
@@ -19,3 +19,5 @@ export default async function handleLogin(req, res) {
     } else res.json({ response: "Username or password is incorrect." });
   } else res.json({ response: "Username or password is incorrect." });
 }
+
+module.exports = { handleLogin };

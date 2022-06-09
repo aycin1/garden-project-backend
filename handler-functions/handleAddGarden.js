@@ -1,4 +1,4 @@
-export default async function handleAddGarden(req, res) {
+async function handleAddGarden(req, res) {
   const { location, garden_name, sessionID } = req.body;
   const id = (await client.query(`SELECT user_id FROM sessions WHERE uuid = $1`, [sessionID])).rows[0]["user_id"];
   console.log(id);
@@ -9,3 +9,5 @@ export default async function handleAddGarden(req, res) {
   );
   res.status(200).json({ response: "Added" });
 }
+
+module.exports = { handleAddGarden };
