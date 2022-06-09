@@ -1,10 +1,9 @@
-async function hashPassword(password) {
-  //   const salt = "we_love_gardens";
-  const hashedPassword = await hasher.hash(password); //can add salt later if we have time to/want to
-  return hashedPassword;
-}
-
 async function handleRegisterUser(req, res, client, hasher) {
+  async function hashPassword(password, hasher) {
+    //   const salt = "we_love_gardens";
+    const hashedPassword = await hasher.hash(password); //can add salt later if we have time to/want to
+    return hashedPassword;
+  }
   const { firstName, lastName, email, password, passwordConfirmation } = await req.body;
 
   if (firstName && lastName && email && password && passwordConfirmation) {
