@@ -1,4 +1,4 @@
-async function handleGetPlants(req, res) {
+async function handleGetPlants(req, res, client) {
   const queryParams = req.url.split("?")[1];
   const queryObj = new URLSearchParams(queryParams);
 

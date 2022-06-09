@@ -1,4 +1,4 @@
-async function handleUpdateGarden(req, res) {
+async function handleUpdateGarden(req, res, client) {
   const id = req.params.id;
   const { name, location } = req.body;
   try {

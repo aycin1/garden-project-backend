@@ -1,4 +1,4 @@
-async function handleValidateSession(req, res) {
+async function handleValidateSession(req, res, client) {
   const { sessionID } = req.body;
   const session = (await client.query(`SELECT * FROM sessions WHERE uuid = $1`, [sessionID])).rows;
 

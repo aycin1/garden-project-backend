@@ -1,4 +1,4 @@
-async function handleGetHarvestDates(req, res) {
+async function handleGetHarvestDates(req, res, client) {
   const userID = req.params.user;
 
   const plants = (

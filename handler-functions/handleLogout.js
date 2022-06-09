@@ -1,4 +1,4 @@
-async function handleLogout(req, res) {
+async function handleLogout(req, res, client) {
   const { sessionID } = req.body;
   if (!sessionID) res.status(400).json({ error: "No Session Data Found" });
   else {

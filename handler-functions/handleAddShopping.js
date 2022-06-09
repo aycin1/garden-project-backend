@@ -1,4 +1,4 @@
-async function handleAddShopping(req, res) {
+async function handleAddShopping(req, res, client) {
   const { plantInfoID, gardenID, quantity } = req.body;
 
   client.query(

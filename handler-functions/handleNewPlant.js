@@ -1,4 +1,4 @@
-async function handleNewPlant(req, res) {
+async function handleNewPlant(req, res, client) {
   const { plantInfoID, gardenID } = req.body;
 
   try {

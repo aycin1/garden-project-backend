@@ -7,6 +7,7 @@ const handleGetGarden = require("./handler-functions/handleGetGarden");
 const handleGetGardensForUser = require("./handler-functions/handleGetGardensForUser");
 const handleGetHarvestDates = require("./handler-functions/handleGetHarvestDates");
 const handleGetIdAndGardensForUser = require("./handler-functions/handleGetIdAndGardensForUser");
+const handleGetPlants = require("./handler-functions/handleGetPlants");
 const handleGetPlantByID = require("./handler-functions/handleGetPlantByID");
 const handleGetShopping = require("./handler-functions/handleGetShopping");
 const handleGetUser = require("./handler-functions/handleGetUser");
@@ -45,30 +46,30 @@ app.use(
   })
 );
 
-// app.get("/plants", handleGetPlants);
-// app.get("/plants/:id", handleGetPlantByID);
-// app.get("/garden/:id", handleGetGarden);
-// app.get("/shopping-list", handleGetShopping);
-// app.get("/gardens/:id", handleGetGardensForUser);
-// app.get("/harvest-dates/:user", handleGetHarvestDates);
-// app.get("/get-user/:session", handleGetUser);
-// app.get("/allGardens/:id", handleGetGardensForUser);
-// app.post("/allGardens", handleGetIdAndGardensForUser);
-// app.post("/validate-session", handleValidateSession);
-// app.post("/sign-up", handleRegisterUser);
-// app.post("/login", handleLogin);
-app.post("/new-garden", handleAddGarden.handleAddGarden);
-// app.post("/new-plant", handleNewPlant);
-// app.post("/shopping-list", handleAddShopping);
-// app.patch("/update-plant-status", handlePlanted);
-// app.patch("/harvest", handleHarvest);
-// app.patch("/update-quantity", handleQuantityChange);
-// app.patch("/update-bought", handleBoughtChange);
-// app.put("/garden/:id", handleUpdateGarden);
-// app.delete("/logout", handleLogout);
-// app.delete("/:id/", handleDeletePlants);
-// app.delete("/shopping-list/:id", handleDeleteShoppingListItem);
+app.get("/plants", (req, res) => handleGetPlants.handleGetPlants(req, res, client));
+app.get("/plants/:id", (req, res) => handleGetPlantByID.handleGetPlantByID(req, res, client));
+app.get("/garden/:id", (req, res) => handleGetGarden.handleGetGarden(req, res, client));
+app.get("/shopping-list", (req, res) => handleGetShopping.handleGetShopping(req, res, client));
+app.get("/gardens/:id", (req, res) => handleGetGardensForUser.handleGetGardensForUser(req, res, client));
+app.get("/harvest-dates/:user", (req, res) => handleGetHarvestDates.handleGetHarvestDates(req, res, client));
+app.get("/get-user/:session", (req, res) => handleGetUser.handleGetUser(req, res, client));
+app.get("/allGardens/:id", (req, res) => handleGetGardensForUser.handleGetGardensForUser(req, res, client));
+app.post("/allGardens", (req, res) => handleGetIdAndGardensForUser.handleGetIdAndGardensForUser(req, res, client));
+app.post("/validate-session", (req, res) => handleValidateSession.handleValidateSession(req, res, client));
+app.post("/sign-up", (req, res) => handleRegisterUser.handleRegisterUser(req, res, client));
+app.post("/login", (req, res) => handleLogin.handleLogin(req, res, client));
+app.post("/new-garden", (req, res) => handleAddGarden.handleAddGarden(req, res, client));
+app.post("/new-plant", (req, res) => handleNewPlant.handleNewPlant(req, res, client));
+app.post("/shopping-list", (req, res) => handleAddShopping.handleAddShopping(req, res, client));
+app.patch("/update-plant-status", (req, res) => handlePlanted.handlePlanted(req, res, client));
+app.patch("/harvest", (req, res) => handleHarvest.handleHarvest(req, res, client));
+app.patch("/update-quantity", (req, res) => handleQuantityChange.handleQuantityChange(req, res, client));
+app.patch("/update-bought", (req, res) => handleBoughtChange.handleBoughtChange(req, res, client));
+app.put("/garden/:id", (req, res) => handleUpdateGarden.handleUpdateGarden(req, res, client));
+app.delete("/logout", (req, res) => handleLogout.handleLogout(req, res, client));
+app.delete("/:id/", (req, res) => handleDeletePlants.handleDeletePlants(req, res, client));
+app.delete("/shopping-list/:id", (req, res) =>
+  handleDeleteShoppingListItem.handleDeleteShoppingListItem(req, res, client)
+);
 
 app.listen(PORT, () => console.log("listening on port " + PORT));
-
-// This comment is to restart the server after a bad request1

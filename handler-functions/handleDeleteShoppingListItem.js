@@ -1,4 +1,4 @@
-export default async function handleDeleteShoppingListItem(req, res) {
+async function handleDeleteShoppingListItem(req, res, client) {
   const id = req.params.id;
   const query = `DELETE FROM shopping_list WHERE id = $1`;
   await client.query(query, [id]);

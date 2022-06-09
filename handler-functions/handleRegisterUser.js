@@ -6,7 +6,7 @@ async function hashPassword(password) {
   return hashedPassword;
 }
 
-async function handleRegisterUser(req, res) {
+async function handleRegisterUser(req, res, client) {
   const { firstName, lastName, email, password, passwordConfirmation } = await req.body;
 
   if (firstName && lastName && email && password && passwordConfirmation) {

@@ -1,4 +1,4 @@
-async function handleQuantityChange(req, res) {
+async function handleQuantityChange(req, res, client) {
   const { quantity, id } = req.body;
 
   client.query(`UPDATE shopping_list SET quantity = $1 WHERE id = $2`, [quantity, id]);

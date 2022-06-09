@@ -1,4 +1,4 @@
-async function handlePlanted(req, res) {
+async function handlePlanted(req, res, client) {
   const { plantID, quantity, date } = req.body;
 
   const harvest_instructions = (

@@ -1,4 +1,4 @@
-async function handleGetIdAndGardensForUser(req, res) {
+async function handleGetIdAndGardensForUser(req, res, client) {
   const { sessionID } = req.body;
 
   const response = (
