@@ -1,6 +1,4 @@
-const hasher = require("pbkdf2-password-hash");
-
-async function handleLogin(req, res, client, uuid) {
+async function handleLogin(req, res, client, uuid, hasher) {
   const { email, password } = req.body;
   const user = (await client.query(`SELECT * FROM users WHERE email = $1`, [email])).rows[0];
 
