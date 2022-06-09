@@ -8,13 +8,24 @@ const { Client } = require("pg");
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-const connection = "postgres://ykwcpoaf:6xDkZhVpuLgvSLqxW-wJSfs_mkVQeyqt@surus.db.elephantsql.com/ykwcpoaf";
+const connection =
+  "postgres://ykwcpoaf:6xDkZhVpuLgvSLqxW-wJSfs_mkVQeyqt@surus.db.elephantsql.com/ykwcpoaf";
 const client = new Client(connection);
 client.connect();
 
 const corsSettings = {
-  origin: ["http://localhost:3000", "https://garden-project-website.sigmalabs.co.uk"],
-  allowedHeaders: ["Access-Control-Allow-Origin", "Authorization", "Content-Type", "Accept", "Origin", "User-Agent"],
+  origin: [
+    "http://localhost:3000",
+    "https://garden-project-website.sigmalabs.co.uk",
+  ],
+  allowedHeaders: [
+    "Access-Control-Allow-Origin",
+    "Authorization",
+    "Content-Type",
+    "Accept",
+    "Origin",
+    "User-Agent",
+  ],
 };
 
 app.use(cookieParser());
@@ -32,6 +43,9 @@ app.get("/garden/:id", handleGetGarden);
 app.get("/shopping-list", handleGetShopping);
 app.get("/gardens/:id", handleGetGardensForUser);
 app.get("/harvest-dates/:user", handleGetHarvestDates);
+app.get("/get-user/:session", handleGetUser);
+app.get("/allGardens/:id", handleGetGardensForUser);
+app.post("/allGardens", handleGetIdAndGardensForUser);
 app.post("/validate-session", handleValidateSession);
 app.post("/sign-up", handleRegisteringUser);
 app.post("/login", handleLogin);
@@ -45,12 +59,54 @@ app.put("/garden/:id", handleUpdateGarden);
 app.delete("/logout", handleLogout);
 app.delete("/:id/", handleDeletePlants);
 app.delete("/shopping-list/:id", handleDeleteShoppingListItem);
+app.post("/new-garden", handleAddGarden);
 
 app.listen(PORT, () => console.log("listening on port " + PORT));
 
+async function handleGetUser(req, res) {
+  const session = req.params.session;
+  const userID = (
+    await client.query(`SELECT user_id FROM sessions WHERE uuid = $1`, [
+      session,
+    ])
+  ).rows[0].user_id;
+  res.status(200).json({ userID });
+}
+
+async function handleAddGarden(req, res) {
+  const { location, garden_name, sessionID } = req.body;
+  const id = (
+    await client.query(`SELECT user_id FROM sessions WHERE uuid = $1`, [
+      sessionID,
+    ])
+  ).rows[0]["user_id"];
+  console.log(id);
+  await client.query(
+    `INSERT INTO gardens (user_id, garden_name, location)
+  VALUES ($1, $2, $3)`,
+    [id, garden_name, location]
+  );
+  res.status(200).json({ response: "Added" });
+}
+
+async function handleGetIdAndGardensForUser(req, res) {
+  const { sessionID } = req.body;
+
+  const response = (
+    await client.query(
+      `SELECT * FROM gardens JOIN sessions ON sessions.user_id = gardens.user_id JOIN users ON sessions.user_id = users.id WHERE uuid = $1`,
+      [sessionID]
+    )
+  ).rows;
+
+  res.status(200).json(response);
+}
+
 async function handleValidateSession(req, res) {
   const { sessionID } = req.body;
-  const session = (await client.query(`SELECT * FROM sessions WHERE uuid = $1`, [sessionID])).rows;
+  const session = (
+    await client.query(`SELECT * FROM sessions WHERE uuid = $1`, [sessionID])
+  ).rows;
 
   let isValid = Boolean(session.length);
 
@@ -93,7 +149,8 @@ async function handleGetHarvestDates(req, res) {
 }
 
 async function handleRegisteringUser(req, res) {
-  const { firstName, lastName, email, password, passwordConfirmation } = await req.body;
+  const { firstName, lastName, email, password, passwordConfirmation } =
+    await req.body;
 
   if (firstName && lastName && email && password && passwordConfirmation) {
     if (password === passwordConfirmation) {
@@ -107,10 +164,14 @@ async function handleRegisteringUser(req, res) {
 
         await res.status(200).json({ response: "Account created!" });
       } catch (error) {
-        await res.status(400).json({ error: "An account already exists for this email!" });
+        await res
+          .status(400)
+          .json({ error: "An account already exists for this email!" });
       }
     } else {
-      await res.status(400).json({ error: "Passwords do not match, please try again" });
+      await res
+        .status(400)
+        .json({ error: "Passwords do not match, please try again" });
     }
   } else {
     await res.status(400).json({ error: "Please provide all data required!" });
@@ -134,7 +195,9 @@ async function handlePlanted(req, res) {
   if (harvest_instructions.includes("weeks")) {
     weeksStr = harvest_instructions.split("weeks")[0];
     if (weeksStr.includes("-")) {
-      const weeks = weeksStr.split("-").map(str => Number(str.replace(/[^0-9]/g, "")));
+      const weeks = weeksStr
+        .split("-")
+        .map((str) => Number(str.replace(/[^0-9]/g, "")));
       const minWeek = weeks[0];
       const maxWeek = weeks[1];
       avgWeeks = (minWeek + maxWeek) / 2;
@@ -144,7 +207,9 @@ async function handlePlanted(req, res) {
   // add some validation for the date
   const planted_at = new Date(date);
   const estimated_harvest_date = new Date(date);
-  estimated_harvest_date.setDate(estimated_harvest_date.getDate() + avgWeeks * 7);
+  estimated_harvest_date.setDate(
+    estimated_harvest_date.getDate() + avgWeeks * 7
+  );
 
   client.query(
     `UPDATE plants_in_garden SET quantity = $1, planted_at = $2, estimated_harvest_date = $3 WHERE id = $4`,
@@ -156,7 +221,10 @@ async function handlePlanted(req, res) {
 async function handleBoughtChange(req, res) {
   const { bought, id } = req.body;
 
-  client.query(`UPDATE shopping_list SET bought = $1 WHERE id = $2`, [bought, id]);
+  client.query(`UPDATE shopping_list SET bought = $1 WHERE id = $2`, [
+    bought,
+    id,
+  ]);
   res.status(200).json({ response: "Bought changed!" });
 }
 
@@ -170,19 +238,26 @@ async function handleGetPlantByID(req, res) {
 async function handleQuantityChange(req, res) {
   const { quantity, id } = req.body;
 
-  client.query(`UPDATE shopping_list SET quantity = $1 WHERE id = $2`, [quantity, id]);
+  client.query(`UPDATE shopping_list SET quantity = $1 WHERE id = $2`, [
+    quantity,
+    id,
+  ]);
   res.status(200).json({ response: "Quantity changed!" });
 }
 
 async function handleGetShopping(req, res) {
-  const response = (await client.query(`SELECT * FROM shopping_list ORDER BY plant_info_id`)).rows;
+  const response = (
+    await client.query(`SELECT * FROM shopping_list ORDER BY plant_info_id`)
+  ).rows;
 
   res.status(200).json(response);
 }
 
 async function handleLogin(req, res) {
   const { email, password } = req.body;
-  const user = (await client.query(`SELECT * FROM users WHERE email = $1`, [email])).rows[0];
+  const user = (
+    await client.query(`SELECT * FROM users WHERE email = $1`, [email])
+  ).rows[0];
 
   if (user) {
     const passwordIsValid = hasher.compare(password, user.hashed_password);
@@ -202,7 +277,8 @@ async function handleLogin(req, res) {
 
 async function handleGetGardensForUser(req, res) {
   const id = req.params.id;
-  const query = `SELECT location, garden_name FROM gardens WHERE user_id = $1;`;
+  if (!id) return res.status(400).json({ error: "No id found" });
+  const query = `SELECT id, location, garden_name FROM gardens WHERE user_id = $1;`;
   const gardens = (await client.query(query, [id])).rows;
   res.json(gardens);
 }
@@ -227,7 +303,9 @@ async function handleGetPlants(req, res) {
 
   for (let i = 0; i < parameterNames.length; i++) {
     const parameterName = parameterNames[i];
-    const parameterValue = queryObj.has(parameterName) ? queryObj.get(parameterName) : undefined;
+    const parameterValue = queryObj.has(parameterName)
+      ? queryObj.get(parameterName)
+      : undefined;
     tempArr.push(parameterValue);
   }
 
@@ -262,7 +340,7 @@ async function handleGetPlants(req, res) {
   let filteredResults = [];
 
   if (queryObj.has("timeUntilHarvest")) {
-    results.forEach(plant => {
+    results.forEach((plant) => {
       let queriedTime = queryObj.get("timeUntilHarvest");
 
       const weeksQueriedAsMinimum = queriedTime.includes("g");
@@ -271,25 +349,31 @@ async function handleGetPlants(req, res) {
 
       let instructions = plant.harvest_instructions;
 
-      if (instructions.includes("weeks")) instructions = instructions.split("weeks")[0];
+      if (instructions.includes("weeks"))
+        instructions = instructions.split("weeks")[0];
       if (instructions.includes("-")) instructions = instructions.split("-")[0];
       let maxHarvestWeeks = Number(instructions.replace(/[^0-9]/g, ""));
 
       if (plant.harvest_instructions.includes("days")) maxHarvestWeeks /= 7;
       if (plant.harvest_instructions.includes("years")) maxHarvestWeeks *= 52;
 
-      if (!weeksQueriedAsMinimum && maxHarvestWeeks < DesiredWeeks) filteredResults.push(plant);
-      if (weeksQueriedAsMinimum && maxHarvestWeeks > DesiredWeeks) filteredResults.push(plant);
+      if (!weeksQueriedAsMinimum && maxHarvestWeeks < DesiredWeeks)
+        filteredResults.push(plant);
+      if (weeksQueriedAsMinimum && maxHarvestWeeks > DesiredWeeks)
+        filteredResults.push(plant);
     });
   }
 
   if (queryObj.has("spacing")) {
-    resultsToFilter = queryObj.has("timeUntilHarvest") ? filteredResults : results; // So that results are nor reintroduced
-    resultsToFilter.forEach(plant => {
+    resultsToFilter = queryObj.has("timeUntilHarvest")
+      ? filteredResults
+      : results; // So that results are nor reintroduced
+    resultsToFilter.forEach((plant) => {
       let queriedSpacing = queryObj.get("spacing");
 
       const spacingQueriedAsMinimum = queriedSpacing.includes("g");
-      if (spacingQueriedAsMinimum) queriedSpacing = queriedSpacing.replace("g", "");
+      if (spacingQueriedAsMinimum)
+        queriedSpacing = queriedSpacing.replace("g", "");
       const DesiredSpacing = Number(queriedSpacing);
 
       let instructions = plant.space_instructions;
@@ -298,12 +382,15 @@ async function handleGetPlants(req, res) {
       let maxSpacing = instructions.replace(/[^0-9]/g, "");
       if (instructions.includes("Metre")) maxSpacing *= 39;
 
-      if (!spacingQueriedAsMinimum && maxSpacing <= DesiredSpacing) filteredResults.push(plant);
-      if (spacingQueriedAsMinimum && maxSpacing >= DesiredSpacing) filteredResults.push(plant);
+      if (!spacingQueriedAsMinimum && maxSpacing <= DesiredSpacing)
+        filteredResults.push(plant);
+      if (spacingQueriedAsMinimum && maxSpacing >= DesiredSpacing)
+        filteredResults.push(plant);
     });
   }
 
-  if (!queryObj.has("timeUntilHarvest") && !queryObj.has("spacing")) filteredResults = results;
+  if (!queryObj.has("timeUntilHarvest") && !queryObj.has("spacing"))
+    filteredResults = results;
 
   res.json(filteredResults);
 }
@@ -350,7 +437,10 @@ async function handleNewPlant(req, res) {
 
 async function handleHarvest(req, res) {
   const { plantID } = req.body;
-  await client.query(`UPDATE plants_in_garden SET harvested = true WHERE id = $1`, [plantID]);
+  await client.query(
+    `UPDATE plants_in_garden SET harvested = true WHERE id = $1`,
+    [plantID]
+  );
 
   res.status(200).json("Harvest registered!");
 }
@@ -359,7 +449,10 @@ async function handleUpdateGarden(req, res) {
   const id = req.params.id;
   const { name, location } = req.body;
   try {
-    client.query(`UPDATE gardens SET garden_name = $1, location = $2 WHERE id = $3`, [name, location, id]);
+    client.query(
+      `UPDATE gardens SET garden_name = $1, location = $2 WHERE id = $3`,
+      [name, location, id]
+    );
   } catch (e) {
     return res.status(500).json({ error: e });
   }
@@ -372,4 +465,5 @@ async function handleDeleteShoppingListItem(req, res) {
   await client.query(query, [id]);
   res.status(200).json({ response: "Deleted successfully" });
 }
-// This comment is to restart the server after a bad request 1
+
+// This comment is to restart the server after a bad request1
