@@ -41,6 +41,8 @@ app.get("/plants", handleGetPlants);
 app.get("/plants/:id", handleGetPlantByID);
 app.get("/garden/:id", handleGetGarden);
 app.get("/shopping-list", handleGetShopping);
+app.get("/gardens/:id", handleGetGardensForUser);
+app.get("/harvest-dates/:user", handleGetHarvestDates);
 app.get("/get-user/:session", handleGetUser);
 app.get("/allGardens/:id", handleGetGardensForUser);
 app.post("/allGardens", handleGetIdAndGardensForUser);
@@ -115,6 +117,35 @@ async function hashPassword(password) {
   //   const salt = "we_love_gardens";
   const hashedPassword = await hasher.hash(password); //can add salt later if we have time to/want to
   return hashedPassword;
+}
+
+async function handleGetHarvestDates(req, res) {
+  const userID = req.params.user;
+
+  const plants = (
+    await client.query(
+      `SELECT name, garden_name, estimated_harvest_date, harvested FROM plants_in_garden
+  JOIN gardens 
+  ON plants_in_garden.garden_id = gardens.id
+  JOIN plant_info
+  ON plants_in_garden.plant_info_id = plant_info.id
+  WHERE user_id = $1`,
+      [userID]
+    )
+  ).rows;
+
+  const harvestDateInfo = [];
+  for (const plant of plants) {
+    if (plant.harvested || !plant.estimated_harvest_date) continue;
+    const plantInfo = {
+      name: plant.name,
+      garden: plant.garden_name,
+      estimatedHarvestDate: plant.estimated_harvest_date,
+    };
+    harvestDateInfo.push(plantInfo);
+  }
+
+  res.status(200).json(harvestDateInfo);
 }
 
 async function handleRegisteringUser(req, res) {
