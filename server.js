@@ -63,7 +63,11 @@ app.listen(PORT, () => console.log("listening on port " + PORT));
 
 async function handleGetUser(req, res) {
   const session = req.params.session;
-  const userID = (await client.query(`SELECT user_id FROM sessions WHERE uuid = $1`, [session])).rows[0].user_id;
+  const userID = (
+    await client.query(`SELECT user_id FROM sessions WHERE uuid = $1`, [
+      session,
+    ])
+  ).rows[0].user_id;
   res.status(200).json({ userID });
 }
 
@@ -88,7 +92,7 @@ async function handleGetIdAndGardensForUser(req, res) {
 
   const response = (
     await client.query(
-      `SELECT * FROM gardens JOIN sessions ON sessions.user_id = gardens.user_id WHERE uuid = $1`,
+      `SELECT * FROM gardens JOIN sessions ON sessions.user_id = gardens.user_id JOIN users ON sessions.user_id = users.id WHERE uuid = $1`,
       [sessionID]
     )
   ).rows;
