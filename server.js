@@ -68,7 +68,7 @@ app.get("/plants/:id", (req, res) =>
 app.get("/garden/:id", (req, res) =>
   handleGetGarden.handleGetGarden(req, res, client)
 );
-app.get("/shopping-list", (req, res) =>
+app.get("/shopping-list/:user", (req, res) =>
   handleGetShopping.handleGetShopping(req, res, client)
 );
 app.get("/gardens/:id", (req, res) =>
