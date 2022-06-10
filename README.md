@@ -10,7 +10,7 @@ This is the GRDN garden data API. From here you can access data pertaining to a 
 
 For information pertaining to the various plant species known to the GRDN API, queries can be made to the /plants endpoint (found at https://garden-project.sigmalabs.co.uk/plants).
 
-<ins>Specifically, the data which can be accessed are as follows:</ins>
+Specifically, the data which can be accessed are as follows:
 
 - The plant's various names
 - Instructions for sowing the plant
