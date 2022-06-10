@@ -58,9 +58,25 @@ The info is returned as a json object with keys "id" (an integer) and "name", "s
 
 In order to access certain features of the API (writing and reading lasting records of what plants you have in your gardens, when they were planted and will need to be harvested etc.), you will first need to login. If you are a first time user it is necessary first to register as a new user. Details of how to do so can be found below.
 
+A new user can be registered by making a post request to the /sign-up endpoint (found at https://garden-project.sigmalabs.co.uk/plants?timeUntilHarvest=12). The post request must contain a body sent as a json string with keys "firstName", "lastName", "email", "password", "passwordConfirmation". Multiple users cannot have the same email address and the password and passwordConfirmation strings must match.
+
 ## Login
 
+In order to access certain features of the API (writing and reading lasting records of what plants you have in your gardens, when they were planted and will need to be harvested etc.), you will first need to login. Requests made to the /login endpoint (found at https://garden-project.sigmalabs.co.uk/login) will return a sessionID cookie whose value can thereafter be supplied for authorisation and identification when making requests to other endpoints within the API.
+
+Login requests are to be made as post requests with a body sent as json string with keys "email" and "password".
+
+A cookie will be sent back with the a session id to be used in future requests, e.g. "session=14128d63-1274-46ba-8fa6-1bd118528dd4;".
+
 ## Get user by session id
+
+Some endpoints need to be supplied with the user id, rather than a session id; one can find the user id associated with a particular session using the endpoint /get-user/:session (where "session" is replaced with the session id in question).
+
+This endpoint returns a json object with one key "userID" and an integer value representing the user's unique id.
+
+# Testing
+
+Several tests are supplied with this API. They can be run using the "npm test" command.
 
 # Dependencies
 
