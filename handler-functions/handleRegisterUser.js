@@ -4,7 +4,8 @@ async function handleRegisterUser(req, res, client, hasher) {
     const hashedPassword = await hasher.hash(password); //can add salt later if we have time to/want to
     return hashedPassword;
   }
-  const { firstName, lastName, email, password, passwordConfirmation } = await req.body;
+  const { firstName, lastName, email, password, passwordConfirmation } =
+    await req.body;
 
   if (firstName && lastName && email && password && passwordConfirmation) {
     if (password === passwordConfirmation) {
@@ -18,10 +19,14 @@ async function handleRegisterUser(req, res, client, hasher) {
 
         await res.status(200).json({ response: "Account created!" });
       } catch (error) {
-        await res.status(400).json({ error: "An account already exists for this email!" });
+        await res
+          .status(400)
+          .json({ error: "An account already exists for this email!" });
       }
     } else {
-      await res.status(400).json({ error: "Passwords do not match, please try again" });
+      await res
+        .status(400)
+        .json({ error: "Passwords do not match, please try again." });
     }
   } else {
     await res.status(400).json({ error: "Please provide all data required!" });
