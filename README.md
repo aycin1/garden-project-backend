@@ -1,12 +1,12 @@
-## GRDN API
+# GRDN API
 
-## Overview
+# Overview
 
 This is the GRDN garden data API. From here you can access data pertaining to a variety of crops and garden plants; additionally this API supports the GRDN website (https://garden-project-website.sigmalabs.co.uk) and can be used to interface with the GRDN database, where users' garden information is stored. This API can be queried at https://garden-project.sigmalabs.co.uk.
 
-## Functionality
+# Functionality
 
-# Accessing Plant Info
+## Accessing Plant Info
 
 For information pertaining to the various plant species known to the GRDN API, queries can be made to the /plants endpoint (found at https://garden-project.sigmalabs.co.uk/plants).
 
@@ -54,7 +54,7 @@ Search a plant by the time it takes to grow:
 
 The info is returned as a json object with keys "id" (an integer) and "name", "sow_instructions", "space_instructions", "harvest_instructions", "compatible_plants", "avoid_instructions", "culinary_hints", "image", "sowing_times" and "classification" (all strings).
 
-## Dependencies
+# Dependencies
 
 Node Express
 Express Body Parser
