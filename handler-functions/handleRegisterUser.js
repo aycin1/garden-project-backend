@@ -8,7 +8,7 @@ async function handleRegisterUser(req, res, client, hasher) {
 
   if (firstName && lastName && email && password && passwordConfirmation) {
     if (password === passwordConfirmation) {
-      const hashedPassword = await hashPassword(password);
+      const hashedPassword = await hashPassword(password, hasher);
 
       try {
         await client.query(
