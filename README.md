@@ -54,6 +54,14 @@ By default, queries to the /plants endpoint will return information for all of t
 
 The info is returned as a json object with keys "id" (an integer) and "name", "sow_instructions", "space_instructions", "harvest_instructions", "compatible_plants", "avoid_instructions", "culinary_hints", "image", "sowing_times" and "classification" (all strings).
 
+## Registering a new User
+
+In order to access certain features of the API (writing and reading lasting records of what plants you have in your gardens, when they were planted and will need to be harvested etc.), you will first need to login. If you are a first time user it is necessary first to register as a new user. Details of how to do so can be found below.
+
+## Login
+
+## Get user by session id
+
 # Dependencies
 
 Node Express
