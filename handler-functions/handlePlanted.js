@@ -1,4 +1,15 @@
 async function handlePlanted(req, res, client) {
+  function validDateString(s) {
+    const match = s.match(/^(\d{4})(\d\d)(\d\d)$/);
+    if (match) {
+      const [year, month, day] = match.slice(1);
+      const iso = `${year}-${month}-${day}T00:00:00.000Z`;
+      const date = new Date(Date.UTC(year, month - 1, day));
+      return date.toISOString() === iso;
+    }
+    return false;
+  }
+
   const { plantID, quantity, date } = req.body;
 
   const harvest_instructions = (
@@ -22,7 +33,7 @@ async function handlePlanted(req, res, client) {
     } else avgWeeks = Number(harvest_instructions.replace(/[^0-9]/g, ""));
   }
 
-  // add some validation for the date
+  if (!validDateString(date.replace(/-/g, ""))) res.json({ error: "Invalid date" });
   const planted_at = new Date(date);
   const estimated_harvest_date = new Date(date);
   estimated_harvest_date.setDate(estimated_harvest_date.getDate() + avgWeeks * 7);
