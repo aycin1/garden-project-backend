@@ -10,7 +10,7 @@ This is the GRDN garden data API. From here you can access data pertaining to a 
 
 For information pertaining to the various plant species known to the GRDN API, queries can be made to the /plants endpoint (found at https://garden-project.sigmalabs.co.uk/plants).
 
-Specifically, the data which can be accessed are as follows:
+<ins>Specifically, the data which can be accessed are as follows:</ins>
 
 - The plant's various names
 - Instructions for sowing the plant
@@ -27,26 +27,26 @@ By default, queries to the /plants endpoint will return information for all of t
 - The family to which it belongs
 - The amount of time the plant takes to grow to harvestable state (in weeks), and the amount of space which needs to be left between crops when initially sowing. These filters can be applied by adding query parameters to the request as described below:
 
-Search a plant by its name:
+<ins>Search a plant by its name:</ins>
 
 - Use the "name" query parameter, e.g. https://garden-project.sigmalabs.co.uk/plants?name=garlic
 - Name requests are case insensitive
 - In cases where a plant has multiple names, only one needs to be specified, e.g. name=bell%20pepper will match the name "Capsicum, also Bell peppers, Sweet peppers" in the database
 
-Search a plant by its family:
+<ins>Search a plant by its family:</ins>
 
 - Use the "classification" query parameter, e.g. https://garden-project.sigmalabs.co.uk/plants?classification=brassica
 - Classification requests are case insensitive
 - The searchable families are as follows:
   {Araceae, Aizoaceae, Alliums, Legumes, Poaceae, Polygonaceae, Zingiberaceae, Caprifoliaceae, Boraginaceae, Solanaceae, Rosaceae, Liliaceae, Umbelliferae, Raphanus, Amaranthaceae, Lamiaceae, Cucurbitaceae, Cruciferae (Brassicas), Oxalis, Malvaceae, Cichorium, Convolvulaceae, Asteraceae}
 
-Search a plant by its spacing:
+<ins>Search a plant by its spacing:</ins>
 
 - Use the "spacing" query parameter, e.g. https://garden-project.sigmalabs.co.uk/plants?spacing=5
 - The value passed through should be the maximum desired spacing in inches; plants will be returned which can be planted closer to one another than the distance supplied
 - If instead, you wish to see plants which must be planted further apart than the value supplied, prefix the value with the character 'g', e.g. https://garden-project.sigmalabs.co.uk/plants?spacing=g32
 
-Search a plant by the time it takes to grow:
+<ins>Search a plant by the time it takes to grow:</ins>
 
 - Use the "timeUntilHarvest" query parameter, e.g. https://garden-project.sigmalabs.co.uk/plants?timeUntilHarvest=12
 - The value passed through should be the maximum desired time until harvest in weeks; plants will be returned which can be harvested after a shorter period of time than the value specified
